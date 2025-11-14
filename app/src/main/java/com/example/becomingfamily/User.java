@@ -8,17 +8,19 @@ public class User {
     private static String uid;
     private static Date lastPeriodDate;
     private static String role;
+    private static Date estimatedDate;
 
     public User()
     {
 
     }
-    public User(String fullName, String email, String uid, Date lastPeriodDate, String role) {
+    public User(String fullName, String email, String uid, Date lastPeriodDate, String role,Date estimatedDate) {
         this.fullName = fullName;
         this.email = email;
         this.uid = uid;
         this.lastPeriodDate = lastPeriodDate;
         this.role = role;
+        this.estimatedDate=estimatedDate;
     }
 
     public String getFullName() {
@@ -48,9 +50,15 @@ public class User {
     public Date getLastPeriodDate() {
         return lastPeriodDate;
     }
+    public Date getEstimatedDate() {
+        return estimatedDate;
+    }
 
     public void setLastPeriodDate(Date lastPeriodDate) {
         this.lastPeriodDate = lastPeriodDate;
+    }
+    public void setEstimatedDate(Date estimatedDate) {
+        this.estimatedDate = estimatedDate;
     }
 
     public String getRole() {

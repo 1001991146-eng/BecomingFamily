@@ -80,8 +80,10 @@ public class RegisterActivity extends AppCompatActivity {
     public void SaveUserInDBS()
     {
         String uid=Auth.getCurrentUser().getUid();
-        Date date = new Date(2025,1,1);
-        User user=new User(etFullName.getText().toString(),etEmailRegister.getText().toString(),uid,date,selectedRole);
+        Date periodDate = new Date(2025,1,1);
+        Date estimated = new Date(2025,10,1);
+
+        User user=new User(etFullName.getText().toString(),etEmailRegister.getText().toString(),uid,periodDate,selectedRole,estimated);
         // שמירת הציון במסד הנתונים
         userRef.child(uid).setValue(user)
                 .addOnSuccessListener(aVoid -> {
