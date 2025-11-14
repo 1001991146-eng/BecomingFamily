@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "649285323482",
+    "project_id": "becomingfamily-a1a0e",
+    "storage_bucket": "becomingfamily-a1a0e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649285323482:android:ac4d51a7e4bbccabadf3e3",
+        "android_client_info": {
+          "package_name": "com.example.becomingfamily"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf5ICfHjcik5jA7w66GY37gNT2svtfxgA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

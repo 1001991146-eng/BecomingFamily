@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BecomingFamily">
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TrackActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
