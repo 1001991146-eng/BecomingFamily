@@ -28,9 +28,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp=getSharedPreferences("babysteps",MODE_PRIVATE);
 
         int weeks= sp.getInt("weeks",1);
-        String email= sp.getString("email", "");
         progressBar.setProgress(weeks);
-        CurrentData currentData=new CurrentData(weeks,email);
 
     }
 

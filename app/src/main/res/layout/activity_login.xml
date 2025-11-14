@@ -5,7 +5,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".LoginActivity"
+    android:layoutDirection="rtl"
+    >
 
     <ImageView
         android:layout_width="54dp"
@@ -135,6 +137,7 @@
         android:layout_marginBottom="156dp"
         android:text="כניסה"
         app:cornerRadius="24dp"
+        android:backgroundTint="@color/teal_200"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

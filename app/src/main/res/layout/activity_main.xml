@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    tools:ignore="ExtraText">
+    tools:ignore="ExtraText"
+    android:layoutDirection="rtl"
+    >
 
     <ImageView
         android:id="@+id/imageView"
@@ -55,6 +57,8 @@
         android:text="כניסה לאפליקציה"
         android:shadowColor="@color/design_default_color_secondary"
         app:cornerRadius="24dp"
+        android:backgroundTint="@color/teal_200"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.457"

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -17,6 +18,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -24,6 +30,9 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvForgotPassword,tvGoRegister;
     private ExtendedFloatingActionButton fabLogin;
     private  CurrentData currentData;
+    private FirebaseDatabase database;
+    private DatabaseReference userRef; // A reference to the root or a specific path
+    public User user;
     public void init()
     {
         etEmail=findViewById(R.id.etEmail);
@@ -36,6 +45,10 @@ public class LoginActivity extends AppCompatActivity {
 
         fabLogin=findViewById(R.id.fabLogin);
         currentData=new CurrentData();
+        database = FirebaseDatabase.getInstance();
+        userRef = database.getReference("Users");
+        user=new User();
+
     }
     public boolean verifyData()
     {
@@ -59,7 +72,40 @@ public class LoginActivity extends AppCompatActivity {
 
         return  currentData;
     }
+    public void LoadUserFromDBS()
+    {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("MARIELA","onDataChange "+dataSnapshot.getKey());
 
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Log.d("MARIELA", "Child snapshot key: " + snapshot.getKey());
+                    user = snapshot.getValue(User.class);
+                    if (user != null && user.getEmail().equals(etEmail.getText().toString())) {
+                        Log.d("MARIELA", "Retrieved user: " + user.toString());
+
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // טיפול בשגיאה
+                Log.e("FirebaseRead", "Failed to read value.", databaseError.toException());
+
+            }
+        });
+    }
+
+
+    public void LoadCurrentData()
+    {
+        SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
+
+        String email= sp.getString("email", "");
+        etEmail.setText(email);
+
+    }
     public void SaveCurrentData(CurrentData currentData)
     {
         SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
@@ -74,7 +120,7 @@ public class LoginActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
         init();
-
+        LoadCurrentData();
 
         fabLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,12 +134,13 @@ public class LoginActivity extends AppCompatActivity {
                             currentData = GetCurrentData(email);
                             SaveCurrentData(currentData);
 
+                            LoadUserFromDBS();
                             Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(LoginActivity.this, TrackActivity.class);
                             startActivity(intent);
                         } else {
-                            etEmail.setError(task.getException().toString());
-                            etPassword.setError(task.getException().toString());
+                            etEmail.setError(task.getException().getMessage());
+
                             Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -101,6 +148,13 @@ public class LoginActivity extends AppCompatActivity {
                 else {
                     Toast.makeText(LoginActivity.this, "Login Failed. " , Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        tvGoRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(LoginActivity.this,RegisterActivity.class);
+                startActivity(intent);
             }
         });
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
