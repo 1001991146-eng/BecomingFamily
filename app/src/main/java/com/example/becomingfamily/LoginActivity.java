@@ -97,6 +97,8 @@ public class LoginActivity extends AppCompatActivity {
                                     Log.d("MARIELA", "Retrieved user: " + user.toString());
                                     tvError.setText("User retrieved successfully.");
                                     // מצאנו את המשתמש, אפשר לצאת מהלולאה
+                                    Intent intent = new Intent(LoginActivity.this, WeeklyUpdateActivity.class);
+                                    startActivity(intent);
                                     break;
                                 }
                             }
@@ -148,8 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                             LoadUserFromDBS();
                             Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                            Intent intent = new Intent(LoginActivity.this, WeeklyUpdateActivity.class);
-                            startActivity(intent);
+
 
                         } else {
                             tvError.setText(task.getException().getMessage());
