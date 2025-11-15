@@ -101,6 +101,10 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         Log.d("MARIELA","WeeklyUpdateActivity");
 
         init();
+        babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week);
+        FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, babyFragment);
+        ft.commit();
 
 
         btn_growth.setOnClickListener(new View.OnClickListener() {

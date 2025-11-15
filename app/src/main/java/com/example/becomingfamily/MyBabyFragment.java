@@ -22,6 +22,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.LateinitKt;
@@ -33,7 +35,8 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
     private TextView tvBabySize;
     private TextView tvGeminiInfo;
     private ImageView ivBabyImage;
-
+    private TextView tvDevelopment; // חדש
+    private TextView tvWeeklyTip; // חדש
 
     private TextView tv_Baby_Weeks;
     public MyBabyFragment(Activity activity, int week) {
@@ -59,12 +62,7 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
                 try {
-                    // 1. ביצוע ה-Parsing ב-Fragment
-                    ParsedData parsed = splitGeminiResponse(rawResponse);
-
-                    // 2. עדכון ה-UI
-                    tvBabySize.setText(parsed.getSizeText());
-                    tvGeminiInfo.setText(android.text.Html.fromHtml(parsed.getOtherInfo(), android.text.Html.FROM_HTML_MODE_LEGACY));
+                 splitGeminiResponse(rawResponse);
 
                 } catch (Exception e) {
                     tvGeminiInfo.setText("שגיאה בעיבוד התוכן.");
@@ -84,9 +82,9 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         }
     }
     // ב. לוגיקת ה-Parsing (ניתן להעביר אותה למחלקה סטטית נפרדת אם תרצה)
-    private ParsedData splitGeminiResponse(String rawText) {
+    private void splitGeminiResponse(String rawText) {
         Log.d("MARIELA","splitGeminiResponse "+rawText);
-
+/*
         final String SIZE_HEADER = "גודל והשוואה";
         final String NEXT_WEEK_HEADER = "מה צפוי בשבוע הבא?";
 
@@ -103,10 +101,88 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
                 cleanSizeText = sizeSection.replace(SIZE_HEADER, "").trim();
             }
         }
-
+*/
         // ... ניתן להוסיף לוגיקה מורכבת יותר כאן ...
 
-        return new ParsedData(cleanSizeText, allOtherText);
+
+            // ** רשימת הכותרות המעודכנת **
+            final String[] HEADERS = {
+                    "**גודלו של התינוק**",
+                    "**התפתחות העובר בשבוע זה**",
+                    "**טיפים שבועיים**" // כותרת חדשה
+            };
+
+            Map<String, String> sections = new HashMap<>();
+
+            // *** 1. לולאת ה-Parsing לחילוץ המקטעים ***
+            for (int i = 0; i < HEADERS.length; i++) {
+                String currentHeader = HEADERS[i];
+                String nextHeader = (i + 1 < HEADERS.length) ? HEADERS[i+1] : null;
+
+                int start = rawText.indexOf(currentHeader);
+                int end = -1;
+
+                if (start != -1) {
+                    if (nextHeader != null) {
+                        end = rawText.indexOf(nextHeader, start + currentHeader.length());
+                    }
+
+                    String sectionText;
+                    if (end != -1) {
+                        sectionText = rawText.substring(start, end);
+                    } else {
+                        sectionText = rawText.substring(start);
+                    }
+
+                    String cleanText = sectionText.replace(currentHeader, "").trim();
+                    String clean = cleanDevelopmentText(cleanText);
+                    sections.put(currentHeader, clean);
+                }
+            }
+
+        String sizeText = sections.getOrDefault(HEADERS[0], "לא נמצא מידע גודל.");
+        //tvBabySize.setText(sizeText);
+        tvBabySize.setText(android.text.Html.fromHtml(sizeText, android.text.Html.FROM_HTML_MODE_LEGACY));
+
+// דוגמה לחילוץ טקסט ההתפתחות:
+        String devText = sections.getOrDefault(HEADERS[1], "לא נמצא מידע התפתחות.");
+        tvDevelopment.setText(android.text.Html.fromHtml(devText, android.text.Html.FROM_HTML_MODE_LEGACY));
+
+        String tipText = sections.getOrDefault(HEADERS[2], "לא נמצאו טיפים רלוונטיים.");
+        tvWeeklyTip.setText(android.text.Html.fromHtml(tipText,android.text.Html.FROM_HTML_MODE_LEGACY));
+        //return new ParsedData(cleanSizeText, allOtherText);
+    }
+    private String cleanDevelopmentText(String rawDevelopmentText) {
+        if (rawDevelopmentText == null || rawDevelopmentText.isEmpty()) {
+            return "אין מידע התפתחות זמין.";
+        }
+
+
+
+        // 1. נסיר רווחים מיותרים ש-Gemini יכול להוסיף בתחילת השורה
+        String cleaned = rawDevelopmentText.trim();
+
+        cleaned = rawDevelopmentText.replaceAll("###.*", "").trim();
+
+        // 2. החלף בולטים (כוכביות או מקפים) בשבירת שורה כפולה (<br><br>)
+        //    כדי להפריד ויזואלית כל נקודה (הוספת רווח לפני כדי למנוע הדבקות למילה קודמת)
+        //    הביטוי הרגולרי: ([*\\-][\\s*]) יחפש * או - ואחריהם רווח (בכמה מקומות בשורה)
+        cleaned = cleaned.replaceAll("[*\\-][\\s*]", "<br>• ");
+
+        // 3. החלף כותרות משנה מודגשות ע"י הוספת שבירת שורה לפניהן
+        //    כדי שהן לא יופיעו סמוך מדי לטקסט שמעליהן
+        //    הביטוי הרגולרי: (\\*\\*[^\\*]+\\*\\*) יחפש כל טקסט בין ** ל-**
+        cleaned = cleaned.replaceAll("(\\*\\*[^\\*]+\\*\\*)", "<br><br><b>$1</b>");
+
+        // 4. סיום ניקוי: הסר את תגי ה-** סביב הכותרות (כדי למנוע כפילות בולטת)
+        cleaned = cleaned.replaceAll("\\*\\*", "");
+
+        // 5. הסר את שבירת השורה אם נוצרה בתחילת הטקסט
+        if (cleaned.startsWith("<br>")) {
+            cleaned = cleaned.replaceFirst("<br>", "");
+        }
+
+        return cleaned;
     }
     // מחלקה פנימית להחזרת נתונים מפוצלים
     private static class ParsedData {
@@ -138,17 +214,24 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         tvBabySize=v.findViewById(R.id.tvBabySize);
         ivBabyImage=v.findViewById(R.id.ivBabyImage);
         tvGeminiInfo=v.findViewById(R.id.tvGeminiInfo);
+        tvDevelopment=v.findViewById(R.id.tvDevelopment);
+        tvWeeklyTip=v.findViewById(R.id.tvWeeklyTip);
 
 
 
         Log.d("MARIELA","current week: "+Integer.toString(week));
+
         String prompt = String.format(
-                "אנא ספק סיכום מקיף ומעודד על התפתחות העובר וגוף האם בשבוע %d. " +
-                        "ענה על שלושת הסעיפים הבאים בפירוט, תוך שימוש בכותרות ברורות:\n\n" +
-                        "1. התפתחות העובר השבוע: מהם האיברים שהתפתחו, או השינויים המרכזיים שחלו בעובר בשבוע זה? (כותרת: 'התינוק שלך בשבוע %d').\n" +
-                        "2. גודל העובר: מהו גודלו של העובר במונחי משקל ואורך (בערך)? השווה את גודלו לפרי נפוץ אחד. (כותרת: 'גודל והשוואה').\n" +
-                        "3. למה לצפות בשבוע הבא: מהם השינויים האפשריים בגוף האם ובעובר בשבוע הריון %d? (כותרת: 'מה צפוי בשבוע הבא?').\n",
-                week, week, week + 1);
+                "אתה יועץ הריון, מומחה להתפתחות עוברית, בעל נימה חיובית ומעודדת. ענה במקצועיות והתמקד אך ורק בתינוק."+
+                "ספק סיכום מקיף על התפתחות העובר בשבוע %d. " +
+                        "**חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
+                        "שלושת הסעיפים הם:\n" +
+                        "1. **גודלו של התינוק**: תאר את גודלו של העובר במונחי משקל ואורך (בערך), והשווה אותו לפרי נפוץ אחד. \n" +
+                        "2. **התפתחות העובר בשבוע זה**: פרט את השינויים הגופניים והתפקודיים המרכזיים שחלים בעובר בשבוע זה. **השתמש בנקודות בולטות (-) לכל שינוי או איבר מרכזי.** \n" + // <--- הוספת הדרישה לבולטים כאן
+                        "3. **טיפים שבועיים**: ספק עצה מעשית קצרה ורלוונטית לשבוע זה (למשל, עצה לתמיכה רגשית או משהו שאפשר לנסות בבית). \n" +
+                        "המידע חייב להתמקד אך ורק בעובר ובטיפים כלליים/רלוונטיים לשבוע זה.",
+                week
+        );
         //GeminiPrompt geminiPrompt=new GeminiPrompt(activity,prompt,tv_Baby_Weeks);
         tv_Baby_Weeks.setText("טוען נתונים...");
         startGeminiLoading(prompt);

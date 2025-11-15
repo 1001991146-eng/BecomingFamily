@@ -60,7 +60,84 @@
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="התפתחות העובר"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp"
+                        android:textColor="#2196F3" />
+
+                    <TextView
+                        android:id="@+id/tvDevelopment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"
+                        android:lineSpacingExtra="3dp"
+                        tools:text="השבוע התינוק מפתח את יכולת השמיעה..."/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:contentPadding="12dp"
+                android:backgroundTint="#E8F5E9">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="💡 טיפ שבועי"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32"
+                        android:layout_marginBottom="4dp"
+                        />
+
+                    <TextView
+                        android:id="@+id/tvWeeklyTip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textStyle="italic"
+                        android:textColor="#2E7D32"
+                        tools:text="כאן יופיע טיפ ממוקד."/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/tv_Baby_Weeks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:paddingBottom="16dp"
+                android:text="Your baby" />
             <TextView
                 android:id="@+id/tvGeminiInfo"
                 android:layout_width="match_parent"
@@ -72,32 +149,6 @@
                 android:paddingBottom="8dp"
                 tools:text="כאן יופיע כל הטקסט הארוך והמעוצב של Gemini המחולק לסעיפים." />
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="2dp"
-                app:contentPadding="12dp"
-                android:backgroundTint="#E8F5E9">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💡 טיפ לשבוע הנוכחי: הקפידי על שתייה מרובה ונוחי מספיק."
-                    android:textSize="15sp"
-                    android:textStyle="italic"
-                    android:textColor="#2E7D32"/>
-            </androidx.cardview.widget.CardView>
-            <TextView
-                android:id="@+id/tv_Baby_Weeks"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:paddingBottom="16dp"
-                android:text="Your baby" />
 
         </LinearLayout>
     </ScrollView>
