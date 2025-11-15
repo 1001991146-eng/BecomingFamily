@@ -3,23 +3,26 @@ package com.example.becomingfamily;
 import java.util.Date;
 
 public class User {
+
     private static String fullName;
     private static String email;
     private static String uid;
     private static LastPeriodDate lastPeriodDate;
     private static String role;
     private static EstimatedDate estimatedDate;
+    public static String phone;
     public User()
     {
 
     }
-    public User(String fullName, String email, String uid, LastPeriodDate lastPeriodDate, String role,EstimatedDate estimatedDate) {
+    public User(String fullName, String email, String uid, LastPeriodDate lastPeriodDate, String role,EstimatedDate estimatedDate, String phone) {
         this.fullName = fullName;
         this.email = email;
         this.uid = uid;
         this.lastPeriodDate = lastPeriodDate;
         this.role = role;
         this.estimatedDate=estimatedDate;
+        this.phone=phone;
     }
 
     public String getFullName() {
@@ -67,11 +70,19 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        User.phone = phone;
+    }
 
     @Override
     public String toString() {
         return "User{" +
                 "fullName='" + fullName + '\'' +
+                ", phone='" + phone +'\'' +
                 ", email='" + email + '\'' +
                 ", uid=" + uid +
                 ", lastPeriodDate=" + lastPeriodDate +

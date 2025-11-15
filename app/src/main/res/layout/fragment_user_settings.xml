@@ -1,14 +1,274 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UserSettingsFragment">
+    tools:context=".UserSettingsFragment"
+    android:layoutDirection="rtl"
+    android:fillViewport="true">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="User settings" />
+        android:layout_height="match_parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="48dp"> <!-- שינוי קריטי 1: הגדלתי את הריפוד התחתון ל-48dp -->
+
+
+            <TextView
+                android:id="@+id/tvETitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="עריכת משתמש"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <!-- כפתורי תפקיד (Role Selection) -->
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fabMom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/teal_200"
+                android:text="אימא"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvETitle" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fabEDad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:backgroundTint="@color/teal_200"
+                android:text="אבא/בן זוג"
+                app:layout_constraintBottom_toBottomOf="@+id/fabMom"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/fabMom" />
+
+            <!-- שדה שם מלא -->
+            <TextView
+                android:id="@+id/tvETitleFullName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp"
+                android:text="שם מלא"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fabMom" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEFullName"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:hint="הכניסו את שמכם המלא "
+                app:layout_constraintTop_toBottomOf="@+id/tvETitleFullName">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEFullName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:textAlignment="viewEnd" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- שדה כתובת דוא''ל -->
+            <TextView
+                android:id="@+id/tvETitleEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="כתובת דוא''ל"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilEFullName" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEEmail"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:hint="הכניסו את כתובת הדוא''ל שלכם"
+                app:layout_constraintTop_toBottomOf="@+id/tvETitleEmail">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEEmailRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:textAlignment="viewEnd" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- שדה מספר סלולרי -->
+            <TextView
+                android:id="@+id/tvETitleMobile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="מספר סלולרי"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilEEmail" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEMobile"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:hint="הכניסו את מספר הטלפון שלכם"
+                app:layout_constraintTop_toBottomOf="@+id/tvETitleMobile"
+                app:startIconDrawable="@drawable/phone"
+                tools:ignore="HardcodedText">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEMobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:maxLength="10"
+                    android:textAlignment="viewEnd" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- שדה סיסמה -->
+            <TextView
+                android:id="@+id/tvETitlePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="סיסמה"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilEMobile" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEPassword"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:hint="הכניסו סיסמה"
+                app:endIconMode="password_toggle"
+                app:layout_constraintTop_toBottomOf="@+id/tvETitlePassword"
+                app:startIconDrawable="@drawable/lock">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etERegisterPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textAlignment="viewEnd" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- שדה אישור סיסמה -->
+            <TextView
+                android:id="@+id/tvETitleConfirmPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="אישור סיסמה"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilEPassword" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEConfirmPassword"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:hint="הכניסו את הסיסמה שוב"
+                app:endIconMode="password_toggle"
+                app:layout_constraintTop_toBottomOf="@+id/tvETitleConfirmPassword"
+                app:startIconDrawable="@drawable/lock">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textAlignment="viewEnd" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- כפתור שמירה -->
+            <Button
+                android:id="@+id/btnEdit"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="@color/teal_200"
+                android:text="שמירה"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@+id/tilEConfirmPassword"
+                />
+
+            <TextView
+                android:id="@+id/tvManageAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="16dp"
+                android:text="ניהול חשבון"
+                android:gravity="center_horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnEdit" />
+
+            <!-- כפתור התנתקות -->
+            <Button
+                android:id="@+id/btnELogout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+            android:backgroundTint="@color/teal_200"
+            android:text="התנתקות"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvManageAccount" />
+
+            <!-- כפתור מחיקה -->
+            <Button
+                android:id="@+id/btnEDelete"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+            android:backgroundTint="@color/teal_200"
+            android:text="מחיקה"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/btnELogout"
+                />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/flower"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+
+                app:layout_constraintTop_toBottomOf="@+id/btnEDelete"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </FrameLayout>

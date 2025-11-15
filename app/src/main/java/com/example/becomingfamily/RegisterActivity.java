@@ -26,7 +26,7 @@ import java.util.Date;
 
 public class RegisterActivity extends AppCompatActivity {
     private ExtendedFloatingActionButton fabDad,fabMom;
-    private TextInputEditText etFullName,etEmailRegister,etRegisterPassword,etConfirmPassword;
+    private TextInputEditText etFullName,etEmailRegister,etRegisterPassword,etConfirmPassword, etMobile;
     private Button btnRegister;
     private TextView tvBackToLogin;
     private CurrentData currentData;
@@ -43,6 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
         etConfirmPassword=findViewById(R.id.etConfirmPassword);
         etEmailRegister=findViewById(R.id.etEmailRegister);
         btnRegister=findViewById(R.id.btnRegister);
+        etMobile=findViewById(R.id.etMobile);
 
         tvBackToLogin=findViewById(R.id.tvBackToLogin);
         tvBackToLogin.setPaintFlags(tvBackToLogin.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
@@ -61,6 +62,11 @@ public class RegisterActivity extends AppCompatActivity {
             etEmailRegister.setError("Missing email");
             return false;
 
+        }
+        if (etMobile.getText().toString().trim().isEmpty())
+        {
+            etMobile.setError("Missing phone");
+            return false;
         }
         if (etRegisterPassword.getText().toString().trim().isEmpty())
         {
@@ -104,7 +110,8 @@ public class RegisterActivity extends AppCompatActivity {
         );
 
 
-        User user=new User(etFullName.getText().toString(),etEmailRegister.getText().toString(),uid,lastPeriodDate,selectedRole,estimatedDate);
+        User user=new User(etFullName.getText().toString(),etEmailRegister.getText().toString(),uid,lastPeriodDate,selectedRole,estimatedDate,etMobile.getText().toString());
+        Log.d("MARIELA","Save user:"+user.toString());
         // שמירת הציון במסד הנתונים
         userRef.child(uid).setValue(user)
                 .addOnSuccessListener(aVoid -> {
