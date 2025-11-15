@@ -1,14 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".YouFragment">
+    tools:context=".YourFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Your life" />
+        android:padding="16dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- כותרת ראשית שתשתנה לפי התפקיד (אמא / בן זוג) -->
+            <TextView
+                android:id="@+id/tv_Partner_And_Me_Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:paddingBottom="16dp"
+                android:textColor="#37474F"
+                tools:text="האישה ובן הזוג בשבוע זה" />
+
+            <!-- כרטיסייה 1: שינויים בגוף/הרגשות (לאמא) או תפקיד (לבן זוג) -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvSection1Header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="השינויים אצלך, אמא"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp"
+                        android:textColor="#880E4F" /> <!-- סגול עמוק -->
+
+                    <TextView
+                        android:id="@+id/tvSection1Content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="#757575"
+                        android:lineSpacingExtra="3dp"
+                        tools:text="כאן יופיע מידע על השינויים הגופניים והרגשיים של האמא."/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- כרטיסייה 2: המלצות/טיפים ממוקדים לאינטראקציה או תמיכה -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvSection2Header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="איך להתמודד ולהתכונן"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp"
+                        android:textColor="#00695C" /> <!-- ירוק-כחול עמוק -->
+
+                    <TextView
+                        android:id="@+id/tvSection2Content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"
+                        android:lineSpacingExtra="3dp"
+                        tools:text="כאן יופיעו המלצות כיצד להתמודד עם התקופה ומה לעשות כדי להתכונן ללידה."/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- כרטיסייה 3: טיפ שבועי/שיתופי (רקע בהיר) -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:contentPadding="12dp"
+                android:backgroundTint="#FFFDE7"> <!-- צהוב בהיר -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="💡 טיפ זוגי לשבוע זה"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#FBC02D"
+                        android:layout_marginBottom="4dp"
+                        />
+
+                    <TextView
+                        android:id="@+id/tvSection3Content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textStyle="italic"
+                        android:textColor="#3E2723"
+                        tools:text="כאן יופיע טיפ ממוקד לאם ולבן/בת הזוג יחד."/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>

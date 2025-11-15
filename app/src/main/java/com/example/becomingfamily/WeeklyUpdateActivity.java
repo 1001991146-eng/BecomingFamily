@@ -55,9 +55,10 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         week=calculateCurrentWeek();
         tvCurrentWeekHeader.setText("שבוע "+Integer.toString(week));
         progressBarHorizontal.setProgress(week);
+
     }
     public int calculateCurrentWeek() {
-        User user=new User();
+         user=new User();
         Log.d("MARIELA","calculateCurrentWeek");
         // נניח ש-user הוא אובייקט User המעודכן
         if (user == null || user.getLastPeriodDate() == null) {
@@ -109,7 +110,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         btn_my_life.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                youFragment=new YouFragment(week);
+                youFragment=new YouFragment(WeeklyUpdateActivity.this,week,user.getRole());
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, youFragment);
                 ft.commit();
