@@ -119,7 +119,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         btn_tests.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                testsFragment=new TestsFragment(week);
+                testsFragment=new TestsFragment(WeeklyUpdateActivity.this,week);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, testsFragment);
                 ft.commit();
