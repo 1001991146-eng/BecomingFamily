@@ -6,15 +6,14 @@ public class User {
     private static String fullName;
     private static String email;
     private static String uid;
-    private static Date lastPeriodDate;
+    private static LastPeriodDate lastPeriodDate;
     private static String role;
-    private static Date estimatedDate;
-
+    private static EstimatedDate estimatedDate;
     public User()
     {
 
     }
-    public User(String fullName, String email, String uid, Date lastPeriodDate, String role,Date estimatedDate) {
+    public User(String fullName, String email, String uid, LastPeriodDate lastPeriodDate, String role,EstimatedDate estimatedDate) {
         this.fullName = fullName;
         this.email = email;
         this.uid = uid;
@@ -47,17 +46,17 @@ public class User {
         this.uid = uid;
     }
 
-    public Date getLastPeriodDate() {
+    public LastPeriodDate getLastPeriodDate() {
         return lastPeriodDate;
     }
-    public Date getEstimatedDate() {
+    public EstimatedDate getEstimatedDate() {
         return estimatedDate;
     }
 
-    public void setLastPeriodDate(Date lastPeriodDate) {
+    public void setLastPeriodDate(LastPeriodDate lastPeriodDate) {
         this.lastPeriodDate = lastPeriodDate;
     }
-    public void setEstimatedDate(Date estimatedDate) {
+    public void setEstimatedDate(EstimatedDate estimatedDate) {
         this.estimatedDate = estimatedDate;
     }
 

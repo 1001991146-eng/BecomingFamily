@@ -21,6 +21,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -80,10 +81,30 @@ public class RegisterActivity extends AppCompatActivity {
     public void SaveUserInDBS()
     {
         String uid=Auth.getCurrentUser().getUid();
-        Date periodDate = new Date(2025,1,1);
-        Date estimated = new Date(2025,10,1);
+        Calendar today = Calendar.getInstance();
 
-        User user=new User(etFullName.getText().toString(),etEmailRegister.getText().toString(),uid,periodDate,selectedRole,estimated);
+// 2. חילוץ רכיבי התאריך
+        int currentDay = today.get(Calendar.DAY_OF_MONTH);
+// חודש: Calendar מחזיר 0-11, לכן אנו מוסיפים 1 כדי לשמור ב-Firebase 1-12
+        int currentMonth = today.get(Calendar.MONTH) + 1;
+        int currentYear = today.get(Calendar.YEAR);
+
+        // 3. יצירת אובייקטי התאריך
+// תאריך המחזור האחרון יוגדר להיום
+        LastPeriodDate lastPeriodDate = new LastPeriodDate(currentDay, currentMonth, currentYear);
+// תאריך הלידה המשוער יחושב מהתאריך הנוכחי (+280 יום)
+// אנו משכפלים את ה-Calendar הנוכחי ומוסיפים 280 יום
+        Calendar estimatedCal = (Calendar) today.clone();
+        estimatedCal.add(Calendar.DAY_OF_YEAR, 280);
+
+        EstimatedDate estimatedDate = new EstimatedDate(
+                estimatedCal.get(Calendar.DAY_OF_MONTH),
+                estimatedCal.get(Calendar.MONTH) + 1, // תיקון החודש לטווח 1-12
+                estimatedCal.get(Calendar.YEAR)
+        );
+
+
+        User user=new User(etFullName.getText().toString(),etEmailRegister.getText().toString(),uid,lastPeriodDate,selectedRole,estimatedDate);
         // שמירת הציון במסד הנתונים
         userRef.child(uid).setValue(user)
                 .addOnSuccessListener(aVoid -> {
@@ -127,8 +148,6 @@ public class RegisterActivity extends AppCompatActivity {
                 selectedRole = "Dad";
             }
         });
-
-
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,7 +165,7 @@ public class RegisterActivity extends AppCompatActivity {
                             currentData.SetWeeks(1);
 
                             SaveUserInDBS();
-                            Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
+                            Intent intent=new Intent(RegisterActivity.this,TrackActivity.class);
                             startActivity(intent);
                         } else {
                             Toast.makeText(RegisterActivity.this, "Signup Failed: " + task.getException(), Toast.LENGTH_SHORT).show();

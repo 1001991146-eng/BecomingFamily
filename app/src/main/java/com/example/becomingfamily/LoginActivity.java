@@ -1,5 +1,4 @@
 package com.example.becomingfamily;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
@@ -27,33 +26,41 @@ import com.google.firebase.database.ValueEventListener;
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText etEmail,etPassword;
-    private TextView tvForgotPassword,tvGoRegister;
+    private TextView tvForgotPassword,tvGoRegister,tvError;
     private ExtendedFloatingActionButton fabLogin;
     private  CurrentData currentData;
     private FirebaseDatabase database;
     private DatabaseReference userRef; // A reference to the root or a specific path
     public User user;
+
+    /* init elements on activity*/
     public void init()
     {
         etEmail=findViewById(R.id.etEmail);
         etPassword=findViewById(R.id.etPassword);
         tvForgotPassword=findViewById(R.id.tvForgotPassword);
         tvForgotPassword.setPaintFlags(tvForgotPassword.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
-
+        tvError=findViewById(R.id.tvError);
         tvGoRegister=findViewById(R.id.tvGoRegister);
+        // display as link
         tvGoRegister.setPaintFlags(tvGoRegister.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
-
         fabLogin=findViewById(R.id.fabLogin);
-        currentData=new CurrentData();
+        // firebase init
         database = FirebaseDatabase.getInstance();
         userRef = database.getReference("Users");
-        user=new User();
 
+        // init loged in user data
+        currentData=new CurrentData();// email
+        user=new User(); // create empty user data
+
+        tvError.setText("");
     }
+    /* verify all data filled in login activity */
     public boolean verifyData()
     {
         Log.d("MARIELA","verifyData");
-        if (etEmail.getText().toString().trim().isEmpty()) {            etEmail.setError("הזן דואל");
+        if (etEmail.getText().toString().trim().isEmpty()) {
+            etEmail.setError("הזן דואל");
             return false;
         }
         if (etPassword.getText().toString().trim().isEmpty())
@@ -61,59 +68,64 @@ public class LoginActivity extends AppCompatActivity {
             etPassword.setError("הזן סיסמה");
             return false;
         }
-
         return true;
     }
-    public CurrentData GetCurrentData(String email)
+    /* save current user as previous loged in user */
+    public CurrentData SavePreviousUser(String email)
     {
         currentData.SetEmail(email);
-        //verify dbs correct weeks-get last period and count weeks
-        currentData.SetWeeks(1);
-
-        return  currentData;
-    }
-    public void LoadUserFromDBS()
-    {
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d("MARIELA","onDataChange "+dataSnapshot.getKey());
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Log.d("MARIELA", "Child snapshot key: " + snapshot.getKey());
-                    user = snapshot.getValue(User.class);
-                    if (user != null && user.getEmail().equals(etEmail.getText().toString())) {
-                        Log.d("MARIELA", "Retrieved user: " + user.toString());
-
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // טיפול בשגיאה
-                Log.e("FirebaseRead", "Failed to read value.", databaseError.toException());
-
-            }
-        });
-    }
-
-
-    public void LoadCurrentData()
-    {
-        SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
-
-        String email= sp.getString("email", "");
-        etEmail.setText(email);
-
-    }
-    public void SaveCurrentData(CurrentData currentData)
-    {
         SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
         SharedPreferences.Editor editor= sp.edit();
         editor.putString("email",currentData.GetEmail());
-        editor.putInt("weeks",currentData.GetWeeks());
         editor.commit();
+        return  currentData;
     }
+    /* get user data from firebase based on email */
+    public void LoadUserFromDBS()
+    {
+        // יוצר שאילתה שמחפשת משתמשים שבהם השדה "email" שווה לערך המבוקש.
+        userRef.orderByChild("email").equalTo(etEmail.getText().toString())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                // snapshot הוא ה-UID של המשתמש (למשל, Q6SS...)
+                                User user = snapshot.getValue(User.class);
+
+                                if (user != null) {
+                                    Log.d("MARIELA", "Retrieved user: " + user.toString());
+                                    tvError.setText("User retrieved successfully.");
+                                    // מצאנו את המשתמש, אפשר לצאת מהלולאה
+                                    break;
+                                }
+                            }
+                        } else {
+                            // לא נמצא משתמש עם האימייל הזה
+                            tvError.setText("User not found.");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        tvError.setText(error.toException().toString());
+
+                    }
+
+                    // ... onCancelled כפי שהיה ...
+                });
+    }
+
+
+/* load previous loged in user from shared prefferences*/
+    public void LoadCurrentData()
+    {
+        SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
+        String email= sp.getString("email", "");
+        etEmail.setText(email);
+    }
+
+    /* main */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,22 +143,24 @@ public class LoginActivity extends AppCompatActivity {
                 if (verifyData()) {
                     Auth.signIn(LoginActivity.this, email, password, task -> {
                         if (task.isSuccessful()) {
-                            currentData = GetCurrentData(email);
-                            SaveCurrentData(currentData);
-
+                            tvError.setText("Login succeded.");
+                            currentData = SavePreviousUser(email);
                             LoadUserFromDBS();
                             Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, TrackActivity.class);
-                            startActivity(intent);
-                        } else {
-                            etEmail.setError(task.getException().getMessage());
 
+                            Intent intent = new Intent(LoginActivity.this, WeeklyUpdateActivity.class);
+                            startActivity(intent);
+
+                        } else {
+                            tvError.setText(task.getException().getMessage());
                             Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
                 else {
                     Toast.makeText(LoginActivity.this, "Login Failed. " , Toast.LENGTH_SHORT).show();
+                    tvError.setText("Login Failed.");
+
                 }
             }
         });

@@ -135,9 +135,9 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="156dp"
+        android:backgroundTint="@color/teal_200"
         android:text="כניסה"
         app:cornerRadius="24dp"
-        android:backgroundTint="@color/teal_200"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -169,6 +169,16 @@
         app:layout_constraintEnd_toStartOf="@+id/tvNewEmail"
         app:layout_constraintHorizontal_bias="0.929"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tvError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:text="error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fabLogin" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

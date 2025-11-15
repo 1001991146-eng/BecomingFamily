@@ -17,19 +17,19 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 public class MainActivity extends AppCompatActivity {
     private ExtendedFloatingActionButton fabStart;
     private ProgressBar progressBar;
+    /*init elements on activity*/
     public void init()
     {
         fabStart=findViewById(R.id.fabStart);
         progressBar=findViewById(R.id.progressBarHorizontal);
 
     }
+    /* show progress on pregnancy by shared prefferences */
     public void getPrevDataSaved()
     {
         SharedPreferences sp=getSharedPreferences("babysteps",MODE_PRIVATE);
-
         int weeks= sp.getInt("weeks",1);
         progressBar.setProgress(weeks);
-
     }
 
 
