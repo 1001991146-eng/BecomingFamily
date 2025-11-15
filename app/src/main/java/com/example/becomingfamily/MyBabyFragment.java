@@ -84,28 +84,6 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
     // ב. לוגיקת ה-Parsing (ניתן להעביר אותה למחלקה סטטית נפרדת אם תרצה)
     private void splitGeminiResponse(String rawText) {
         Log.d("MARIELA","splitGeminiResponse "+rawText);
-/*
-        final String SIZE_HEADER = "גודל והשוואה";
-        final String NEXT_WEEK_HEADER = "מה צפוי בשבוע הבא?";
-
-        int sizeStartIndex = rawText.indexOf(SIZE_HEADER);
-        int nextSectionIndex = rawText.indexOf(NEXT_WEEK_HEADER);
-
-        String cleanSizeText = "";
-        String allOtherText = rawText; // ברירת מחדל: כל הטקסט
-
-        if (sizeStartIndex != -1) {
-            if (nextSectionIndex != -1 && nextSectionIndex > sizeStartIndex) {
-                // חילוץ טקסט הגודל והצגתו ב-tvSizeInfo
-                String sizeSection = rawText.substring(sizeStartIndex, nextSectionIndex).trim();
-                cleanSizeText = sizeSection.replace(SIZE_HEADER, "").trim();
-            }
-        }
-*/
-        // ... ניתן להוסיף לוגיקה מורכבת יותר כאן ...
-
-
-            // ** רשימת הכותרות המעודכנת **
             final String[] HEADERS = {
                     "**גודלו של התינוק**",
                     "**התפתחות העובר בשבוע זה**",
@@ -135,13 +113,12 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
                     }
 
                     String cleanText = sectionText.replace(currentHeader, "").trim();
-                    String clean = cleanDevelopmentText(cleanText);
+                    String clean = cleanRawText(cleanText);
                     sections.put(currentHeader, clean);
                 }
             }
 
         String sizeText = sections.getOrDefault(HEADERS[0], "לא נמצא מידע גודל.");
-        //tvBabySize.setText(sizeText);
         tvBabySize.setText(android.text.Html.fromHtml(sizeText, android.text.Html.FROM_HTML_MODE_LEGACY));
 
 // דוגמה לחילוץ טקסט ההתפתחות:
@@ -150,14 +127,11 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         String tipText = sections.getOrDefault(HEADERS[2], "לא נמצאו טיפים רלוונטיים.");
         tvWeeklyTip.setText(android.text.Html.fromHtml(tipText,android.text.Html.FROM_HTML_MODE_LEGACY));
-        //return new ParsedData(cleanSizeText, allOtherText);
     }
-    private String cleanDevelopmentText(String rawDevelopmentText) {
+    private String cleanRawText(String rawDevelopmentText) {
         if (rawDevelopmentText == null || rawDevelopmentText.isEmpty()) {
             return "אין מידע התפתחות זמין.";
         }
-
-
 
         // 1. נסיר רווחים מיותרים ש-Gemini יכול להוסיף בתחילת השורה
         String cleaned = rawDevelopmentText.trim();
@@ -184,19 +158,7 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         return cleaned;
     }
-    // מחלקה פנימית להחזרת נתונים מפוצלים
-    private static class ParsedData {
-        private final String sizeText;
-        private final String otherInfo;
 
-        public ParsedData(String sizeText, String otherInfo) {
-            this.sizeText = sizeText;
-            this.otherInfo = otherInfo;
-        }
-
-        public String getSizeText() { return sizeText; }
-        public String getOtherInfo() { return otherInfo; }
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

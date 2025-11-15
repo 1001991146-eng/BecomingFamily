@@ -55,9 +55,6 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         week=calculateCurrentWeek();
         tvCurrentWeekHeader.setText("שבוע "+Integer.toString(week));
         progressBarHorizontal.setProgress(week);
-
-
-
     }
     public int calculateCurrentWeek() {
         User user=new User();
@@ -66,29 +63,22 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         if (user == null || user.getLastPeriodDate() == null) {
             return 0; // טיפול במקרה של נתונים חסרים
         }
-
         LastPeriodDate last = user.getLastPeriodDate();
-
         // 1. יצירת אובייקט Calendar
         Calendar lastPeriodCal = Calendar.getInstance();
-
         // 2. הגדרת התאריך הנכון:
         // הערה חשובה: חודשי Calendar הם 0-11, לכן יש להחסיר 1 ממה שמגיע מה-DB (1-12)
         int year = last.getYear();
         int month = last.getMonth() - 1; // התיקון העיקרי! אם החודש 1 (ינואר), הוא יהפוך ל-0.
         int day = last.getDay();
-
         // הגדרת התאריך ב-Calendar
         lastPeriodCal.set(year, month, day);
-
         // 3. חילוץ תאריכים
         Date lastPeriodDate = lastPeriodCal.getTime();
         Date today = new Date(); // התאריך הנוכחי
-
         // 4. חישוב ההפרש במילישניות ובימים
         long diffInMillies = today.getTime() - lastPeriodDate.getTime();
         long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
         // 5. חישוב שבוע ההיריון
         // כל 7 ימים הם שבוע שלם, מוסיפים 1 כדי להתחיל ספירה משבוע 1.
         return (int) (diffInDays / 7) + 1;
@@ -143,9 +133,6 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 ft.commit();
             }
         });
-
-
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.weelkyUpdate), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
