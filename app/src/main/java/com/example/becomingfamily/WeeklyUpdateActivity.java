@@ -128,7 +128,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         btn_user_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                userSettingsFragment=new UserSettingsFragment(week);
+                userSettingsFragment=new UserSettingsFragment(WeeklyUpdateActivity.this,week);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, userSettingsFragment);
                 ft.commit();
