@@ -8,34 +8,55 @@
     tools:context=".WeeklyUpdateActivity"
     android:background="@android:color/white">
 
-    <TextView
-        android:id="@+id/tvCurrentWeekHeader"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cv"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="שבוע 22"
-        android:textSize="24sp"
-        android:textStyle="bold"
+        android:backgroundTint="#E8F5E9"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:contentPadding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ProgressBar
-        android:id="@+id/progressBarHorizontal"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="25dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:progress="22"
-        android:max="40"
-        android:progressTint="#4CAF50"
-        android:backgroundTint="#E0E0E0"
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="63dp"
+            android:layout_height="43dp"
+            android:src="@drawable/pregnant"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.421"
+            tools:layout_editor_absoluteX="332dp" />
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvCurrentWeekHeader" />
+        <TextView
+            android:id="@+id/tvCurrentWeekHeader"
+            android:layout_width="128dp"
+            android:layout_height="41dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="172dp"
+            android:text="שבוע 22"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/imageView2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progressBarHorizontal"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="378dp"
+            android:layout_height="0dp"
+            android:backgroundTint="#E0E0E0"
+            android:max="40"
+            android:progress="22"
+            android:progressTint="#4CAF50"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvCurrentWeekHeader" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
         android:id="@+id/fragment_container"
@@ -45,7 +66,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBarHorizontal" />
+        app:layout_constraintTop_toBottomOf="@+id/cv" />
 
     <LinearLayout
         android:id="@+id/bottom_buttons_container"

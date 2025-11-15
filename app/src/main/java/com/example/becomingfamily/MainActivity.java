@@ -14,7 +14,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-
+/*
+* TBD - save phone number for forgot password and broadcast reciever for sms
+*  broadcast reciever for network disconnction - firebase stops working!
+* edit user settiongs: name, phone, password, lastperiod, role
+* Logout
+* * */
 public class MainActivity extends AppCompatActivity {
     private ExtendedFloatingActionButton fabStart;
     private ProgressBar progressBar;
