@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+
 }
 
 android {
@@ -13,8 +14,13 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        buildFeatures {
+            buildConfig = true
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String","GEMINI_API_KEY","\"AIzaSyCEMC1mru4ur4hr2IS2wzLgyO_OYhKf6PA\"")
+
     }
 
     buildTypes {
@@ -33,6 +39,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.generativeai)
+    implementation("com.google.guava:guava:33.0.0-jre")
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation(libs.appcompat)
     implementation(libs.material)

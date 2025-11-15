@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -14,6 +15,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.java.GenerativeModelFutures;
+import com.google.ai.client.generativeai.type.Content;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +41,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
     public User user;
     private int week;
     private TextView tvCurrentWeekHeader;
+    private ProgressBar progressBarHorizontal;
 
     public void init()
     {
@@ -43,8 +50,13 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         btn_tests=findViewById(R.id.btn_tests);
         btn_user_settings=findViewById(R.id.btn_user_settings);
         tvCurrentWeekHeader=findViewById(R.id.tvCurrentWeekHeader);
+        progressBarHorizontal=findViewById(R.id.progressBarHorizontal);
+
         week=calculateCurrentWeek();
         tvCurrentWeekHeader.setText("שבוע "+Integer.toString(week));
+        progressBarHorizontal.setProgress(week);
+
+
 
     }
     public int calculateCurrentWeek() {
@@ -90,10 +102,11 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
 
         init();
 
+
         btn_growth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                babyFragment=new MyBabyFragment(week);
+                babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, babyFragment);
                 ft.commit();
