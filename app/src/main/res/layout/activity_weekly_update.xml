@@ -2,9 +2,102 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/weelkyUpdate"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WeeklyUpdateActivity">
+    tools:context=".WeeklyUpdateActivity"
+    android:background="@android:color/white">
 
+    <TextView
+        android:id="@+id/tvCurrentWeekHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="שבוע 22"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBarHorizontal"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:progress="22"
+        android:max="40"
+        android:progressTint="#4CAF50"
+        android:backgroundTint="#E0E0E0"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvCurrentWeekHeader" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBarHorizontal" />
+
+    <LinearLayout
+        android:id="@+id/bottom_buttons_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btn_growth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="הביבי שלי"
+            android:textColor="@color/teal_200"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:drawableTop="@drawable/baby" />
+
+        <Button
+            android:id="@+id/btn_my_life"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="החיים שלי"
+            android:textColor="@color/teal_200"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:drawableTop="@drawable/you" />
+
+        <Button
+            android:id="@+id/btn_tests"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="בדיקות מעקב"
+            android:textColor="@color/teal_200"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:drawableTop="@drawable/test" />
+
+        <Button
+            android:id="@+id/btn_user_settings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="הגדרות"
+            android:textColor="@color/teal_200"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:drawableTop="@drawable/user_settings" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
