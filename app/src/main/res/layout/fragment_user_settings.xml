@@ -6,11 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".UserSettingsFragment"
     android:layoutDirection="rtl"
-    android:fillViewport="true">
+
+    >
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/main"
@@ -31,29 +34,43 @@
                 />
 
             <!-- כפתורי תפקיד (Role Selection) -->
+
+            <!-- שדה שם מלא -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/llRole"
+                android:gravity="center_horizontal"
+                >
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/fabEMom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginTop="52dp"
                 android:backgroundTint="@color/teal_200"
                 android:text="אימא"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvETitle" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_editor_absoluteX="248dp"
+
+                />
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/fabEDad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginTop="52dp"
                 android:backgroundTint="@color/teal_200"
                 android:text="אבא/בן זוג"
-                app:layout_constraintBottom_toBottomOf="@+id/fabMom"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.676"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/fabMom" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="30dp"
+                />
 
-            <!-- שדה שם מלא -->
+            </LinearLayout>
             <TextView
                 android:id="@+id/tvETitleFullName"
                 android:layout_width="wrap_content"
@@ -62,7 +79,7 @@
                 android:layout_marginEnd="16dp"
                 android:text="שם מלא"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/fabEMom" />
+                app:layout_constraintTop_toBottomOf="@+id/llRole" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilEFullName"
@@ -108,6 +125,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
+                    android:enabled="false"
                     android:textAlignment="viewEnd" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -150,9 +168,40 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="סיסמה"
+                android:text="סיסמה ישנה"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tilEMobile" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEOriginalPassword"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:hint=" ישנה סיסמה"
+                app:endIconMode="password_toggle"
+                app:layout_constraintTop_toBottomOf="@+id/tvETitlePassword"
+                app:startIconDrawable="@drawable/lock">
+
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEOriginalRegisterPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textAlignment="viewEnd" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/tvEChangeTitlePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="סיסמה חדשה"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilEOriginalPassword" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilEPassword"
@@ -163,7 +212,7 @@
                 android:layout_marginTop="4dp"
                 android:hint="הכניסו סיסמה"
                 app:endIconMode="password_toggle"
-                app:layout_constraintTop_toBottomOf="@+id/tvETitlePassword"
+                app:layout_constraintTop_toBottomOf="@+id/tvEChangeTitlePassword"
                 app:startIconDrawable="@drawable/lock">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -218,6 +267,18 @@
                 android:textSize="18sp"
                 app:layout_constraintTop_toBottomOf="@+id/tilEConfirmPassword"
                 />
+            <Button
+                android:id="@+id/btnTrack"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="@color/teal_200"
+                android:text="שינוי מחזור אחרון"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@+id/btnEdit"
+                />
 
             <TextView
                 android:id="@+id/tvManageAccount"
@@ -229,7 +290,7 @@
                 android:gravity="center_horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnEdit" />
+                app:layout_constraintTop_toBottomOf="@+id/btnTrack" />
 
             <!-- כפתור התנתקות -->
             <Button

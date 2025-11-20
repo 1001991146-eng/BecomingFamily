@@ -15,10 +15,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 /*
-* TBD - save phone number for forgot password and broadcast reciever for sms
+* TBD -   broadcast reciever for sms - forgot password
 *  broadcast reciever for network disconnction - firebase stops working!
-* edit user settiongs: name, phone, password, lastperiod, role
-* Logout
+* edit user settings: name, phone, password, lastperiod, role
 * * */
 public class MainActivity extends AppCompatActivity {
     private ExtendedFloatingActionButton fabStart;

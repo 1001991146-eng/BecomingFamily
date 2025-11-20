@@ -127,6 +127,7 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         String tipText = sections.getOrDefault(HEADERS[2], "לא נמצאו טיפים רלוונטיים.");
         tvWeeklyTip.setText(android.text.Html.fromHtml(tipText,android.text.Html.FROM_HTML_MODE_LEGACY));
+        tv_Baby_Weeks.setText("");
     }
     private String cleanRawText(String rawDevelopmentText) {
         if (rawDevelopmentText == null || rawDevelopmentText.isEmpty()) {

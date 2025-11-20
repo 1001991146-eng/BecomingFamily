@@ -40,8 +40,13 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
     private DatabaseReference userRef; // A reference to the root or a specific path
     public User user;
     private int week;
+    private int days;
     private TextView tvCurrentWeekHeader;
     private ProgressBar progressBarHorizontal;
+    public static final String BABY_FRAGMENT_TAG = "my_baby_fragment"; // תג קבוע
+    public static final String YOU_FRAGMENT_TAG = "you_baby_fragment"; // תג קבוע
+    public static final String TESTS_FRAGMENT_TAG = "tests_baby_fragment"; // תג קבוע
+    public static final String SETTINGS_FRAGMENT_TAG = "settings_baby_fragment"; // תג קבוע
 
     public void init()
     {
@@ -52,17 +57,17 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         tvCurrentWeekHeader=findViewById(R.id.tvCurrentWeekHeader);
         progressBarHorizontal=findViewById(R.id.progressBarHorizontal);
 
-        week=calculateCurrentWeek();
-        tvCurrentWeekHeader.setText("שבוע "+Integer.toString(week));
+        calculateCurrentWeek();
+        tvCurrentWeekHeader.setText("שבוע "+Integer.toString(week)+" ( יום "+days+" )");
         progressBarHorizontal.setProgress(week);
 
     }
-    public int calculateCurrentWeek() {
+    public void calculateCurrentWeek() {
          user=new User();
         Log.d("MARIELA","calculateCurrentWeek");
         // נניח ש-user הוא אובייקט User המעודכן
         if (user == null || user.getLastPeriodDate() == null) {
-            return 0; // טיפול במקרה של נתונים חסרים
+            return ; // טיפול במקרה של נתונים חסרים
         }
         LastPeriodDate last = user.getLastPeriodDate();
         // 1. יצירת אובייקט Calendar
@@ -82,7 +87,9 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
         // 5. חישוב שבוע ההיריון
         // כל 7 ימים הם שבוע שלם, מוסיפים 1 כדי להתחיל ספירה משבוע 1.
-        return (int) (diffInDays / 7) + 1;
+        week= (int) (diffInDays / 7) + 1;
+        days=(int) (diffInDays % 7);
+
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +102,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week);
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, babyFragment);
+        ft.addToBackStack(BABY_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
         ft.commit();
 
 
@@ -104,6 +112,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, babyFragment);
+                ft.addToBackStack(BABY_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
                 ft.commit();
             }
         });
@@ -113,6 +122,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 youFragment=new YouFragment(WeeklyUpdateActivity.this,week,user.getRole());
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, youFragment);
+                ft.addToBackStack(YOU_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
                 ft.commit();
             }
         });
@@ -122,6 +132,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 testsFragment=new TestsFragment(WeeklyUpdateActivity.this,week);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, testsFragment);
+                ft.addToBackStack(TESTS_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
                 ft.commit();
             }
         });
@@ -131,6 +142,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 userSettingsFragment=new UserSettingsFragment(WeeklyUpdateActivity.this,week);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, userSettingsFragment);
+                ft.addToBackStack(SETTINGS_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
                 ft.commit();
             }
         });

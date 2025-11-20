@@ -1,15 +1,11 @@
 package com.example.becomingfamily;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +13,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,16 +38,18 @@ import com.google.firebase.database.ValueEventListener;
 public class UserSettingsFragment extends Fragment {
 
     private ExtendedFloatingActionButton fabEMom, fabEDad;
-    private TextInputEditText etEFullName,etEEmailRegister,etEMobile,etERegisterPassword,etEConfirmPassword;
-    private Button btnEdit,btnELogout,btnEDelete;
+    private TextInputEditText etEFullName,etEEmailRegister,etEMobile,etERegisterPassword,etEConfirmPassword,etEOriginalRegisterPassword;
+    private Button btnEdit,btnELogout,btnEDelete,btnTrack;
     private User user;
     private  int week;
+    private String  newRole;
     private Context context;
     private FirebaseDatabase database;
     private DatabaseReference userRef;
 
     private FirebaseAuth mAuth; // חשוב!
     private FirebaseUser firebaseUser; // חשוב!
+    public static final String BABY_FRAGMENT_TAG = "my_baby_fragment"; // תג קבוע
 
     public UserSettingsFragment(Context context, int week) {
         // Required empty public constructor
@@ -63,7 +67,7 @@ public class UserSettingsFragment extends Fragment {
     // --- לוגיקת מחיקת משתמש (Auth + DB) ---
     private void deleteUserAccount(final String password) {
         if (firebaseUser == null || user.getEmail() == null) {
-            Toast.makeText(context, "שגיאה: משתמש לא מחובר או חסר אימייל.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "שגיאה: משתמש לא מחובר או חסר אימייל.", LENGTH_LONG).show();
             return;
         }
 
@@ -88,13 +92,13 @@ public class UserSettingsFragment extends Fragment {
                                                 deleteUserDataFromRealtimeDB(email);
                                             } else {
                                                 Log.e("MARIELA", "Firebase Auth delete failed.", deleteTask.getException());
-                                                Toast.makeText(context, "שגיאה במחיקת חשבון האימות. נסה שוב.", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(context, "שגיאה במחיקת חשבון האימות. נסה שוב.", LENGTH_LONG).show();
                                             }
                                         }
                                     });
                         } else {
                             Log.e("MARIELA", "Re-authentication failed.", reauthTask.getException());
-                            Toast.makeText(context, "הסיסמה שגויה או נדרש התחברות נוספת.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "הסיסמה שגויה או נדרש התחברות נוספת.", LENGTH_LONG).show();
                         }
                     }
                 });
@@ -110,7 +114,7 @@ public class UserSettingsFragment extends Fragment {
                                 snapshot.getRef().removeValue()
                                         .addOnSuccessListener(aVoid -> {
                                             Log.d("MARIELA", "User data for " + emailToDelete + " deleted successfully from Realtime DB.");
-                                            Toast.makeText(context, "החשבון נמחק בהצלחה.", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(context, "החשבון נמחק בהצלחה.", LENGTH_LONG).show();
                                             // לאחר מחיקה מלאה, נווט למסך ההתחברות/ראשי
                                             Intent intent = new Intent(context, MainActivity.class);
                                             // נקה את כל ה-Activities הקודמים מה-stack
@@ -119,7 +123,7 @@ public class UserSettingsFragment extends Fragment {
                                         })
                                         .addOnFailureListener(e -> {
                                             Log.e("MARIELA", "Failed to delete user data for " + emailToDelete, e);
-                                            Toast.makeText(context, "שגיאה במחיקת הנתונים. נסה שוב.", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(context, "שגיאה במחיקת הנתונים. נסה שוב.", LENGTH_LONG).show();
                                         });
                             }
                         } else {
@@ -130,7 +134,7 @@ public class UserSettingsFragment extends Fragment {
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         Log.e("MARIELA", "Realtime Database query cancelled: " + databaseError.getMessage());
-                        Toast.makeText(context, "שגיאה בגישה לבסיס הנתונים.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "שגיאה בגישה לבסיס הנתונים.", LENGTH_LONG).show();
                     }
                 });
     }
@@ -169,7 +173,117 @@ public class UserSettingsFragment extends Fragment {
         builder.setNegativeButton("בטל", null);
         builder.create().show();
     }
+    public boolean verifyUser()
+    {
+        if (etEOriginalRegisterPassword.getText().toString().trim().isEmpty())
+        {
+            etEOriginalRegisterPassword.setError("Missing email");
+        }
+        if (etEFullName.getText().toString().trim().isEmpty())
+        {
+            etEFullName.setError("Missing email");
+            return false;
 
+        }
+        if (etEMobile.getText().toString().trim().isEmpty())
+        {
+            etEMobile.setError("Missing phone");
+            return false;
+        }
+        if (etERegisterPassword.getText().toString().trim().isEmpty())
+        {
+            etERegisterPassword.setError("Missing password");
+            return false;
+        }
+        if (etERegisterPassword.getText().toString().length()<6) {
+            etERegisterPassword.setError("Password must be at least 6 characters");
+            return false;
+        }
+        if (!etERegisterPassword.getText().toString().equals(etEConfirmPassword.getText().toString()))
+        {
+            etERegisterPassword.setError("Password must be the same");
+            return false;
+        }
+        return  true;
+    }
+
+    public void SaveDataInFirebase()
+    {
+        if (verifyUser())
+        {
+            String uid=Auth.getCurrentUser().getUid();
+            user.setFullName(etEFullName.getText().toString());
+            user.setEmail(etEEmailRegister.getText().toString());
+            user.setPhone(etEMobile.getText().toString());
+            user.setRole(newRole);
+            // verify old passord
+            // 1. יצירת Credential מהסיסמה הישנה
+            AuthCredential credential = EmailAuthProvider.getCredential(
+                        Auth.getCurrentUser().getEmail(),
+                        etEOriginalRegisterPassword.getText().toString()
+            );
+            Auth.getCurrentUser().reauthenticate(credential)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            // 3. אימות מחדש הצליח, כעת ניתן לשנות את הסיסמה
+                            Auth.getCurrentUser().updatePassword(etERegisterPassword.getText().toString())
+                                    .addOnCompleteListener(updateTask -> {
+                                        if (updateTask.isSuccessful()) {
+                                            Toast.makeText(context, "הסיסמה עודכנה בהצלחה!", Toast.LENGTH_SHORT).show();
+
+                                            Log.d("MARIELA","Save user:"+user.toString());
+                                            userRef.orderByChild("email").equalTo(user.getEmail())
+                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            if (dataSnapshot.exists()) {
+                                                                // נמצא משתמש עם האימייל הנתון
+                                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                                    // שלב 2: עדכון הנתונים של המשתמש
+                                                                    snapshot.getRef().setValue(user)
+                                                                            .addOnSuccessListener(aVoid -> {
+
+                                                                                Log.d("MARIELA", "User properties for " + user.getEmail() + " updated successfully.");
+                                                                                Toast.makeText(context,"שינויים נשמרו", LENGTH_LONG).show();
+
+
+                                                                                getParentFragmentManager().popBackStack(BABY_FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                                                            })
+                                                                            .addOnFailureListener(e -> {
+                                                                                Log.e("MARIELA", "Failed to update user properties for " + user.getEmail(), e);
+                                                                            });
+                                                                }
+                                                            } else {
+                                                                // לא נמצא משתמש עם האימייל הנתון
+                                                                Log.d("MARIELA", "User with email " + user.getEmail() + " not found for update.");
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                            // טיפול בשגיאות
+                                                            Log.e("MARIELA", "Database query cancelled: " + databaseError.getMessage());
+                                                        }
+                                                    });
+
+
+
+
+                                        } else {
+                                            Log.e("ChangePassword", "עדכון סיסמה נכשל", updateTask.getException());
+                                            Toast.makeText(context, "עדכון סיסמה נכשל.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        } else {
+                            // אימות מחדש נכשל (הסיסמה הישנה שגויה)
+                            Log.e("ChangePassword", "אימות מחדש נכשל", task.getException());
+                            Toast.makeText(context, "הסיסמה הנוכחית שגויה.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }
+
+
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,13 +303,17 @@ public class UserSettingsFragment extends Fragment {
         btnEdit=v.findViewById(R.id.btnEdit);
         btnELogout=v.findViewById(R.id.btnELogout);
         btnEDelete=v.findViewById(R.id.btnEDelete);
+        btnTrack=v.findViewById(R.id.btnTrack);
+        etEOriginalRegisterPassword=v.findViewById(R.id.etEOriginalRegisterPassword);
 
         if (user.getRole().equals("Mom"))
         {
+            newRole="Mom";
             fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.teal_200));
             fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
         }
         else {
+            newRole="Dad";
             fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.teal_200));
             fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
         }
@@ -203,10 +321,35 @@ public class UserSettingsFragment extends Fragment {
         etEFullName.setText(user.getFullName());
         etEEmailRegister.setText(user.getEmail());
         etEMobile.setText(user.getPhone());
+        fabEDad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                newRole="Dad";
+                fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.teal_200));
+                fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
+            }
+        });
+        fabEMom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                newRole="Mom";
+                fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.teal_200));
+                fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
+
+            }
+        });
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SaveDataInFirebase();
 
+            }
+        });
+        btnTrack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(context,TrackActivity.class);
+                startActivity(intent);
             }
         });
         btnEDelete.setOnClickListener(new View.OnClickListener() {
