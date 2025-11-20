@@ -31,6 +31,7 @@ import kotlin.LateinitKt;
 
 public class MyBabyFragment extends Fragment implements GeminiResponseListener {
     private  int week;
+    private int days;
     private Activity activity;
     private TextView tvBabySize;
     private TextView tvGeminiInfo;
@@ -39,10 +40,11 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
     private TextView tvWeeklyTip; // חדש
 
     private TextView tv_Baby_Weeks;
-    public MyBabyFragment(Activity activity, int week) {
+    public MyBabyFragment(Activity activity, int week, int days) {
         // Required empty public constructor
         this.week=week;
         this.activity=activity;
+        this.days=days;
     }
 
     private void startGeminiLoading(String prompt) {
@@ -77,7 +79,8 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                tvGeminiInfo.setText("שגיאת רשת/API: " + errorMessage);
+                tv_Baby_Weeks.setText("שגיאת רשת/API. לא ניתן לטעון מידע .");
+
             });
         }
     }
@@ -186,14 +189,15 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         String prompt = String.format(
                 "אתה יועץ הריון, מומחה להתפתחות עוברית, בעל נימה חיובית ומעודדת. ענה במקצועיות והתמקד אך ורק בתינוק."+
-                "ספק סיכום מקיף על התפתחות העובר בשבוע %d. " +
+                "ספק סיכום מקיף על התפתחות העובר בשבוע %d יום %d. " +
                         "**חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
                         "שלושת הסעיפים הם:\n" +
                         "1. **גודלו של התינוק**: תאר את גודלו של העובר במונחי משקל ואורך (בערך), והשווה אותו לפרי נפוץ אחד. \n" +
                         "2. **התפתחות העובר בשבוע זה**: פרט את השינויים הגופניים והתפקודיים המרכזיים שחלים בעובר בשבוע זה. **השתמש בנקודות בולטות (-) לכל שינוי או איבר מרכזי.** \n" + // <--- הוספת הדרישה לבולטים כאן
                         "3. **טיפים שבועיים**: ספק עצה מעשית קצרה ורלוונטית לשבוע זה (למשל, עצה לתמיכה רגשית או משהו שאפשר לנסות בבית). \n" +
                         "המידע חייב להתמקד אך ורק בעובר ובטיפים כלליים/רלוונטיים לשבוע זה.",
-                week
+                week,
+                days
         );
         //GeminiPrompt geminiPrompt=new GeminiPrompt(activity,prompt,tv_Baby_Weeks);
         tv_Baby_Weeks.setText("טוען נתונים...");

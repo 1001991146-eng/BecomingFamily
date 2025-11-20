@@ -18,7 +18,8 @@ import java.util.Map;
 public class TestsFragment extends Fragment implements GeminiResponseListener {
 
     private Activity activity;
-    private  int week;
+    private int week;
+    private int days;
     private TextView tvTitle;
     private TextView tvTestsHeader;
     private TextView tvTestsContent;
@@ -31,10 +32,11 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
             "**כיצד להבין את התוצאות**",
             "**הבדיקות הבאות**"
     };
-    public TestsFragment(Activity activity,int week) {
+    public TestsFragment(Activity activity,int week,int days) {
         // Required empty public constructor
         this.week=week;
         this.activity=activity;
+        this.days=days;
 
     }
 
@@ -64,13 +66,14 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
 
         // יצירת הפרומפט וטעינת הנתונים
         String prompt = String.format(
-                "אתה יועץ רפואי הריוני. ספק מידע רפואי מדויק על הבדיקות הנדרשות בשבוע %d. " +
+                "אתה יועץ רפואי הריוני. ספק מידע רפואי מדויק על הבדיקות הנדרשות בשבוע %d יום %d. " +
                         "**חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
                         "שלושת הסעיפים הם:\n" +
                         "1. **הבדיקות הרלוונטיות לשבוע זה**: פרט אילו בדיקות רופא/משרד הבריאות ממליץ לבצע בשבוע זה. **השתמש בנקודות בולטות (-).**\n" +
                         "2. **כיצד להבין את התוצאות**: הסבר באופן כללי מה אומרות תוצאות תקינות ומהן נקודות הדגל האדום שצריך לשים לב אליהן בבדיקות הנפוצות של השלב הזה. \n" +
                         "3. **הבדיקות הבאות**: ספק הצצה קדימה לשבועות הבאים, ציין בקצרה אילו בדיקות מרכזיות מצפות לאם (למשל, סקירות, בדיקות סוכר).",
-                week
+                week,
+                days
         );
 
         // הצגת סטטוס טעינה

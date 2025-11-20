@@ -42,7 +42,8 @@ public class UserSettingsFragment extends Fragment {
     private TextInputEditText etEFullName,etEEmailRegister,etEMobile,etERegisterPassword,etEConfirmPassword,etEOriginalRegisterPassword;
     private Button btnEdit,btnELogout,btnEDelete,btnTrack;
     private User user;
-    private  int week;
+    private int week;
+    private int days;
     private String  newRole;
     private Context context;
     private FirebaseDatabase database;
@@ -52,9 +53,10 @@ public class UserSettingsFragment extends Fragment {
     private FirebaseUser firebaseUser; // חשוב!
     public static final String BABY_FRAGMENT_TAG = "my_baby_fragment"; // תג קבוע
 
-    public UserSettingsFragment(Context context, int week) {
+    public UserSettingsFragment(Context context, int week, int days) {
         // Required empty public constructor
         this.week=week;
+        this.days=days;
         this.context=context;
         user=new User();
 
@@ -215,7 +217,7 @@ public class UserSettingsFragment extends Fragment {
 
         // 2. יצירה והחלפה ל-MyBabyFragment כפרגמנט הבסיס החדש
         // אנחנו לא מוסיפים את זה ל-Back Stack כדי שכפתור ה-Back יצא מה-Activity
-        MyBabyFragment newBabyFragment = new MyBabyFragment((Activity)context, week);
+        MyBabyFragment newBabyFragment = new MyBabyFragment((Activity)context, week,days);
         fm.beginTransaction()
                 .replace(R.id.fragment_container, newBabyFragment, BABY_FRAGMENT_TAG)
                 .commit();

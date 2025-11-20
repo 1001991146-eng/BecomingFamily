@@ -1,11 +1,17 @@
 package com.example.becomingfamily;
 
+import androidx.appcompat.app.AlertDialog;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -30,7 +36,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class WeeklyUpdateActivity extends AppCompatActivity {
+public class WeeklyUpdateActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
     private MyBabyFragment babyFragment;
     private UserSettingsFragment userSettingsFragment;
     private TestsFragment testsFragment;
@@ -47,7 +53,19 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
     public static final String YOU_FRAGMENT_TAG = "you_baby_fragment"; // תג קבוע
     public static final String TESTS_FRAGMENT_TAG = "tests_baby_fragment"; // תג קבוע
     public static final String SETTINGS_FRAGMENT_TAG = "settings_baby_fragment"; // תג קבוע
-
+    private ConnectivityReceiver connectivityReceiver;
+    private AlertDialog noConnectionDialog;
+// --- מתודת עזר סטטית לבדיקת רשת ---
+    /**
+     * בודק אם יש חיבור רשת פעיל.
+     */
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return false;
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        // מחזיר True אם הרשת פעילה או בתהליך התחברות
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
     public void init()
     {
         btn_growth=findViewById(R.id.btn_growth);
@@ -91,6 +109,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         days=(int) (diffInDays % 7);
 
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +118,9 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         Log.d("MARIELA","WeeklyUpdateActivity");
 
         init();
-        babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week);
+        connectivityReceiver = new ConnectivityReceiver();
+
+        babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week,days);
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, babyFragment);
         ft.addToBackStack(BABY_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
@@ -110,7 +131,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         btn_growth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week);
+                babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week,days);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, babyFragment);
                 ft.addToBackStack(BABY_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
@@ -121,7 +142,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         btn_my_life.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                youFragment=new YouFragment(WeeklyUpdateActivity.this,week,user.getRole());
+                youFragment=new YouFragment(WeeklyUpdateActivity.this,week,days,user.getRole());
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, youFragment);
                 ft.addToBackStack(YOU_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
@@ -132,7 +153,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         btn_tests.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                testsFragment=new TestsFragment(WeeklyUpdateActivity.this,week);
+                testsFragment=new TestsFragment(WeeklyUpdateActivity.this,week,days);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, testsFragment);
                 ft.addToBackStack(TESTS_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
@@ -143,7 +164,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         btn_user_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                userSettingsFragment=new UserSettingsFragment(WeeklyUpdateActivity.this,week);
+                userSettingsFragment=new UserSettingsFragment(WeeklyUpdateActivity.this,week,days);
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, userSettingsFragment);
                 ft.addToBackStack(SETTINGS_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
@@ -158,5 +179,87 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    // --- ניהול ה-BroadcastReceiver (רישום וביטול רישום) ---
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // **5. רישום:** ה-Activity מוגדר כמאזין וה-Receiver נרשם להאזנה לשינויי רשת
+        ConnectivityReceiver.connectivityReceiverListener = WeeklyUpdateActivity.this;
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        // שימוש ב-registerReceiver עם IntentFilter
+        registerReceiver(connectivityReceiver, intentFilter);
+
+        // בדיקה מיידית של המצב הנוכחי עם טעינת האקטיביטי
+        handleConnectivityChange(isNetworkAvailable(this));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // **6. ביטול רישום:** ביטול הרישום של ה-Receiver למניעת דליפות זיכרון
+        unregisterReceiver(connectivityReceiver);
+        ConnectivityReceiver.connectivityReceiverListener = null;
+    }
+
+    /**
+     * יישום המתודה מהממשק לטיפול בשינוי מצב רשת, נקרא על ידי ה-Receiver
+     * @param isConnected True אם מחובר, False אחרת.
+     */
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        handleConnectivityChange(isConnected);
+    }
+
+    /**
+     * לוגיקה מרכזית לטיפול בחיבור/ניתוק
+     */
+    private void handleConnectivityChange(boolean isConnected) {
+        if (!isConnected) {
+            // טיפול במקרה של ניתוק
+            Log.d("NetworkStatus", "Internet Disconnected!");
+            showNoConnectionDialog();
+        } else {
+            // טיפול במקרה של חיבור מחדש
+            Log.d("NetworkStatus", "Internet Connected!");
+
+            // סגירת הדיאלוג אם הוא מוצג
+            if (noConnectionDialog != null && noConnectionDialog.isShowing()) {
+                noConnectionDialog.dismiss();
+                noConnectionDialog = null;
+            }
+            Toast.makeText(this, "הרשת חזרה! הנתונים מעודכנים כעת.", Toast.LENGTH_SHORT).show();
+            babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week,days);
+            FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, babyFragment);
+            ft.addToBackStack(BABY_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
+            ft.commit();
+        }
+    }
+
+    /**
+     * מציג דיאלוג אזהרה מונע סגירה על ניתוק רשת
+     */
+    private void showNoConnectionDialog() {
+        // מציג דיאלוג רק אם הוא אינו מוצג כבר
+        if (noConnectionDialog != null && noConnectionDialog.isShowing()) {
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("⚠️ אין חיבור לאינטרנט");
+        builder.setMessage("האפליקציה דורשת חיבור רשת פעיל. נתונים חדשים או עדכונים לא ייטענו עד שתתחברי שוב.");
+        // ניתן להשתמש באייקון רלוונטי אם יש (לדוגמה: R.drawable.ic_no_internet)
+        // builder.setIcon(R.drawable.baby);
+
+        builder.setPositiveButton("הבנתי", null);
+        builder.setCancelable(false); // מונע סגירה על ידי לחיצה מחוץ לדיאלוג (חובה במקרה של חוסר רשת)
+
+        noConnectionDialog = builder.create();
+        noConnectionDialog.show();
     }
 }

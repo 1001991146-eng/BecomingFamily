@@ -14,14 +14,11 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link YouFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class YouFragment extends Fragment implements GeminiResponseListener {
     private Activity activity;
     private int week;
+    private int days;
     private String role; // 'Mom' או 'Dad'
     private TextView tvTitle;
     private TextView tvSection1Header;
@@ -43,11 +40,12 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
             "**טיפ זוגי לשבוע זה**"
     };
 
-    public YouFragment(Activity activity, int week, String role) {
+    public YouFragment(Activity activity, int week, int days, String role) {
         // Required empty public constructor
         this.week=week;
         this.role=role;
         this.activity=activity;
+        this.days=days;
 
     }
 
@@ -81,12 +79,13 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
         if (role.equals("Mom"))
         {
              prompt = String.format(
-                    "ספק מידע על השינויים הפיזיים והרגשיים של האישה בשבוע %d. **חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
+                    "ספק מידע על השינויים הפיזיים והרגשיים של האישה בשבוע %d יום %d. **חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
                             "שלושת הסעיפים הם:\n" +
                             "1. **השינויים אצלך, אמא**: תאר את השינויים הפיזיים והרגשיים הנפוצים בשבוע זה. **השתמש בנקודות בולטות (-).**\n" +
                             "2. **איך להתמודד ולהתכונן**: ספק עצות מעשיות להתמודדות עם תסמינים והכנות שרלוונטיות לשלב זה של ההריון (בדיקות, תזונה).\n" +
                             "3. **טיפ זוגי לשבוע זה**: ספק פעילות משותפת קצרה או עצה לחיזוק הקשר הזוגי בשבוע זה.",
-                    week
+                    week,
+                     days
             );
         }
         else {
