@@ -6,8 +6,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.telephony.SmsManager;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +26,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,151 +38,72 @@ import java.util.Random;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
-    private TextView tvFError;
-    private TextInputEditText etFEmail,etFPhone,etCode;
-    private ExtendedFloatingActionButton fabSendSMS,fabFLogin;
+    private EditText et_reset_email;
+    private Button btn_reset_password;
     private  CurrentData currentData;
     public User user;
-    public static ProgressBar pbBussy;
-    public static String code;
     private FirebaseDatabase database;
     private DatabaseReference userRef; // A reference to the root or a specific path
-    /*
-    public SMSReceiver smsReceiver;
-    public IntentFilter intentFilterSMS;
-    public HelpHandler handler;
-    public CountDownTimer cdt;
-    public final int MAX_TIME=6000;
-    public final int SECOND=1000;
-    public long missing ;
-*/
+    private FirebaseAuth auth;
+    private ProgressBar progressBar;
+
     public void init()
     {
-        etFEmail=findViewById(R.id.etFEmail);
-        etFPhone=findViewById(R.id.etFPhone);
-        etCode=findViewById(R.id.etCode);
-        fabSendSMS=findViewById(R.id.fabSendSMS);
-        fabFLogin=findViewById(R.id.fabFLogin);
-        pbBussy=findViewById(R.id.pbBussy);
-        tvFError=findViewById(R.id.tvFError);
-        code="-1";
+
+        et_reset_email=findViewById(R.id.et_reset_email);
+        btn_reset_password=findViewById(R.id.btn_reset_password);
         // init loged in user data
         currentData=new CurrentData();// email
-        user=new User(); // create empty user data
-    }
-    /*
-    public  int getRandomCode()
-    {
-        int code=0;
-        Random random = new Random();
-        // צור מספר אקראי בין 100000 ל-999999
-        code = random.nextInt(1000000) - 100000;
-        Log.d("MARIELA","random:"+code);
-        return  code;
-    }
-    public void ask4Permissions()
-    {
-        String[] permissions = {android.Manifest.permission.SEND_SMS,
-                android.Manifest.permission.RECEIVE_SMS
-        };
-        ActivityCompat.requestPermissions(ForgotPasswordActivity.this,
-                permissions,
-                1);
-    }
-    public void register4Broadcast()
-    {
-        smsReceiver = new SMSReceiver();
-        intentFilterSMS = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-        registerReceiver(smsReceiver, intentFilterSMS);
-    }
-    public void sendSMS()
-    {
-        String phoneNum=etFPhone.getText().toString();
-        // verify phone num same as DBS
-        code=Integer.toString(getRandomCode());
-        String msg=code;
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNum, null, msg, null, null);
-            Toast.makeText(ForgotPasswordActivity.this, "Sent to:" +phoneNum+" msg: "+ msg,Toast.LENGTH_LONG).show();
-        }
-        catch (Exception e)
-        {
-            Toast.makeText(ForgotPasswordActivity.this, "Failed to send SMS:" + e.getMessage(),Toast.LENGTH_LONG).show();
-        }
-        fabSendSMS.setEnabled(false);
-        pbBussy.setVisibility(View.VISIBLE);
-        if (cdt!=null)
-        {
-            cdt.cancel();
-        }
-        missing=MAX_TIME;
-        cdt=new CountDownTimer(missing,SECOND) {
-            @Override
-            public void onTick(long l) {
-            }
-            @Override
-            public void onFinish() {
-                fabSendSMS.setEnabled(true);
-                pbBussy.setVisibility(View.INVISIBLE);
-                if (cdt != null) {
-                    cdt.cancel();
-                    cdt = null;
-                }
-            }
-        }.start();
+        user=new User(); // create empty user data*/
+        auth = FirebaseAuth.getInstance();
+        progressBar = findViewById(R.id.progress_bar_reset);
 
     }
-    public void defineHandler()
-    {
-        handler=new HelpHandler(ForgotPasswordActivity.this);
+    private void resetPassword() {
+        String email = et_reset_email.getText().toString().trim();
 
-    }
-*/
-    public CurrentData SavePreviousUser(String email)
-    {
-        currentData.SetEmail(email);
-        SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
-        SharedPreferences.Editor editor= sp.edit();
-        editor.putString("email",currentData.GetEmail());
-        editor.commit();
-        return  currentData;
-    }
-    /* get user data from firebase based on email */
-    public void LoadUserFromDBS()
-    {
-        // יוצר שאילתה שמחפשת משתמשים שבהם השדה "email" שווה לערך המבוקש.
-        userRef.orderByChild("email").equalTo(etFEmail.getText().toString())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                // snapshot הוא ה-UID של המשתמש (למשל, Q6SS...)
-                                User user = snapshot.getValue(User.class);
+        // 1. בדיקות תקינות
+        if (TextUtils.isEmpty(email)) {
+            et_reset_email.setError("יש להזין כתובת דוא\"ל.");
+            return;
+        }
 
-                                if (user != null) {
-                                    Log.d("MARIELA", "Retrieved user: " + user.toString());
-                                    tvFError.setText("User retrieved successfully.");
-                                    // מצאנו את המשתמש, אפשר לצאת מהלולאה
-                                    Intent intent = new Intent(ForgotPasswordActivity.this, WeeklyUpdateActivity.class);
-                                    startActivity(intent);
-                                    break;
-                                }
-                            }
-                        } else {
-                            // לא נמצא משתמש עם האימייל הזה
-                            tvFError.setText("User not found.");
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            et_reset_email.setError("כתובת הדוא\"ל אינה תקינה.");
+            return;
+        }
+
+        // 2. הצגת סרגל התקדמות ונטרול כפתור
+        progressBar.setVisibility(View.VISIBLE);
+        btn_reset_password.setEnabled(false);
+
+        // 3. קריאה לפונקציה של Firebase לאיפוס סיסמה
+        auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(task -> {
+                    progressBar.setVisibility(View.GONE);
+                    btn_reset_password.setEnabled(true);
+
+                    if (task.isSuccessful()) {
+                        // הצלחה: הודעה למשתמש לבדוק את הדוא"ל שלו
+                        Toast.makeText(ForgotPasswordActivity.this,
+                                "נשלח קישור לאיפוס סיסמה לכתובת הדוא\"ל שלך. אנא בדקי את תיבת הדואר.",
+                                Toast.LENGTH_LONG).show();
+
+                        // אופציונלי: סגירת המסך וחזרה למסך ההתחברות לאחר שליחה מוצלחת
+                        finish();
+                    } else {
+                        // כישלון: הצגת הודעת שגיאה
+                        String errorMessage = "שגיאה באיפוס הסיסמה. נסי שוב.";
+
+                        if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                            // אם המשתמש לא קיים או הדוא"ל לא תקין
+                            errorMessage = "הדוא\"ל שהוזן אינו רשום או אינו תקין.";
+                        } else if (task.getException() != null) {
+                            Log.e("ForgotPassword", "Firebase Error: " + task.getException().getMessage());
+                            errorMessage = "שגיאה: ודאי שהדוא\"ל שהוזן נכון והחיבור פעיל.";
                         }
+                        Toast.makeText(ForgotPasswordActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        tvFError.setText(error.toException().toString());
-
-                    }
-
-                    // ... onCancelled כפי שהיה ...
                 });
     }
     @Override
@@ -185,46 +112,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_forgot_password);
         init();
-        /*
-        ask4Permissions();
-       defineHandler();
-        fabSendSMS.setOnClickListener(new View.OnClickListener() {
+        btn_reset_password.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*sendSMS();
-                if  (etCode.getText().toString().equals(ForgotPasswordActivity.code)) {
-
-                    Auth.signIn(ForgotPasswordActivity.this, user.getEmail(), password, task -> {
-                        if (task.isSuccessful()) {
-                            tvFError.setText("Login succeded.");
-                            currentData = SavePreviousUser(email);
-                            LoadUserFromDBS();
-                            Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-
-
-
-                        } else {
-                            tvFError.setText(task.getException().getMessage());
-                            Toast.makeText(ForgotPasswordActivity.this, "Login Failed: " + task.getException(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-                else {
-                    Toast.makeText(ForgotPasswordActivity.this, "Login Failed. " , Toast.LENGTH_SHORT).show();
-                    tvFError.setText("Login Failed.");
-
-                }
-                    Intent it = new Intent(ForgotPasswordActivity.this, WeeklyUpdateActivity.class);
-                    startActivity(it);
-
-
-
-
-
-                }
+                resetPassword();
+            }
         });
-*/
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.forgot_password_layout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
