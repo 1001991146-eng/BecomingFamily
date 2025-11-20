@@ -2,6 +2,7 @@ package com.example.becomingfamily;
 
 import static android.widget.Toast.LENGTH_LONG;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -206,6 +207,22 @@ public class UserSettingsFragment extends Fragment {
         }
         return  true;
     }
+    public void resetToMyBabyFragment() {
+        FragmentManager fm = getParentFragmentManager();
+        // 1. ניקוי מוחלט של ערימת החזרה
+        // null ו-POP_BACK_STACK_INCLUSIVE מוחק את הכל.
+        fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        // 2. יצירה והחלפה ל-MyBabyFragment כפרגמנט הבסיס החדש
+        // אנחנו לא מוסיפים את זה ל-Back Stack כדי שכפתור ה-Back יצא מה-Activity
+        MyBabyFragment newBabyFragment = new MyBabyFragment((Activity)context, week);
+        fm.beginTransaction()
+                .replace(R.id.fragment_container, newBabyFragment, BABY_FRAGMENT_TAG)
+                .commit();
+
+        // 3. ודא שהטרנזקציות הקודמות הסתיימו
+        fm.executePendingTransactions();
+    }
 
     public void SaveDataInFirebase()
     {
@@ -245,9 +262,10 @@ public class UserSettingsFragment extends Fragment {
 
                                                                                 Log.d("MARIELA", "User properties for " + user.getEmail() + " updated successfully.");
                                                                                 Toast.makeText(context,"שינויים נשמרו", LENGTH_LONG).show();
+                                                                                resetToMyBabyFragment();
 
 
-                                                                                getParentFragmentManager().popBackStack(BABY_FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                                                                Log.d("MARIELA","goto baby fragment");
                                                                             })
                                                                             .addOnFailureListener(e -> {
                                                                                 Log.e("MARIELA", "Failed to update user properties for " + user.getEmail(), e);

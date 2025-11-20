@@ -104,6 +104,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
         ft.replace(R.id.fragment_container, babyFragment);
         ft.addToBackStack(BABY_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
         ft.commit();
+        Log.d("MARIELA","Save baby fragment tag");
 
 
         btn_growth.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +115,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 ft.replace(R.id.fragment_container, babyFragment);
                 ft.addToBackStack(BABY_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
                 ft.commit();
+                Log.d("MARIELA","Save baby fragment tag");
             }
         });
         btn_my_life.setOnClickListener(new View.OnClickListener() {
@@ -124,6 +126,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 ft.replace(R.id.fragment_container, youFragment);
                 ft.addToBackStack(YOU_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
                 ft.commit();
+                Log.d("MARIELA","Save you fragment tag");
             }
         });
         btn_tests.setOnClickListener(new View.OnClickListener() {
@@ -134,6 +137,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 ft.replace(R.id.fragment_container, testsFragment);
                 ft.addToBackStack(TESTS_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
                 ft.commit();
+                Log.d("MARIELA","Save tests fragment tag");
             }
         });
         btn_user_settings.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +148,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity {
                 ft.replace(R.id.fragment_container, userSettingsFragment);
                 ft.addToBackStack(SETTINGS_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
                 ft.commit();
+                Log.d("MARIELA","Save user settings fragment tag");
             }
         });
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.weelkyUpdate), (v, insets) -> {
