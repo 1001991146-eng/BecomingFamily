@@ -38,6 +38,7 @@
                         android:scaleType="centerCrop"
                         android:layout_marginBottom="8dp"
                         android:src="@drawable/prettybaby"
+                        android:visibility="gone"
                         android:contentDescription="תמונת העובר בשבוע זה" />
 
                     <TextView
