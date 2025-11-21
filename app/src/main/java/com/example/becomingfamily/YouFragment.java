@@ -102,7 +102,7 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
                     week
             );
         }
-        tvTitle.setText(String.format("שבוע %d: טוען נתונים עבור %s...", week, role.equals("Mom") ? "האם" : "האב"));
+        tvTitle.setText(String.format(" טוען נתונים עבור %s..." , role.equals("Mom") ? "האם" : "האב"));
 
         // שימוש בפונקציה הקיימת שלך לשליחת בקשה ל-Gemini
         startGeminiLoading(prompt);
@@ -137,7 +137,13 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
             getActivity().runOnUiThread(() -> {
                 try {
                     parseAndDisplaySections(rawResponse, role);
-                    tvTitle.setText(String.format("שבוע %d", week)); // עדכון כותרת סופית
+                    if(role.equals("Mom"))
+                    {
+                        tvTitle.setText("לדאוג לעצמך: צעד אחר צעד");
+                    }
+                    else{
+                    tvTitle.setText("משפחה גדלה: המקום שלך במסע"); // עדכון כותרת סופית
+                        }
                 } catch (Exception e) {
                     Log.e("PARTNER_FRAG", "Error parsing content", e);
                     tvTitle.setText("שגיאה בעיבוד התוכן.");

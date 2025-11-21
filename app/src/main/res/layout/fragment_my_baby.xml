@@ -9,7 +9,11 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:paddingTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp">
 
         <LinearLayout
             android:id="@+id/content_container"
@@ -134,7 +138,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
                         android:textStyle="italic"
-                        android:textColor="#2E7D32"
+                        android:textColor="@android:color/black"
                         tools:text="כאן יופיע טיפ ממוקד."/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

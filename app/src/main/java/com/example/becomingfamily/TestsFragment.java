@@ -61,7 +61,7 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
         tvUpcomingTestsContent = v.findViewById(R.id.tvUpcomingTestsContent);
 
         // עדכון כותרת ראשונית
-        tvTitle.setText(String.format("שבוע %d: בדיקות והנחיות רפואיות", week));
+        tvTitle.setText(String.format("בדיקות והנחיות רפואיות"));
 
 
         // יצירת הפרומפט וטעינת הנתונים
@@ -100,7 +100,7 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
             getActivity().runOnUiThread(() -> {
                 try {
                     parseAndDisplaySections(rawResponse);
-                    tvTitle.setText(String.format("שבוע %d: בדיקות רפואיות", week)); // עדכון כותרת סופית
+                    tvTitle.setText(String.format("בדיקות רפואיות")); // עדכון כותרת סופית
                 } catch (Exception e) {
                     Log.e("TESTS_FRAG", "Error parsing content", e);
                     tvTitle.setText("שגיאה בעיבוד התוכן הרפואי.");

@@ -1,5 +1,4 @@
 package com.example.becomingfamily;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -74,6 +73,7 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
     @Override
     public void onGeminiFailure(String errorMessage) {
+
         Log.d("MARIELA","onGeminiFailure!!!");
 
         if (getActivity() != null) {
@@ -134,7 +134,7 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         String tipText = sections.getOrDefault(HEADERS[2], "לא נמצאו טיפים רלוונטיים.");
         tvWeeklyTip.setText(android.text.Html.fromHtml(tipText,android.text.Html.FROM_HTML_MODE_LEGACY));
-        tv_Baby_Weeks.setText("");
+        tv_Baby_Weeks.setText("המסע המופלא של התינוק");
     }
     private String cleanRawText(String rawDevelopmentText) {
         if (rawDevelopmentText == null || rawDevelopmentText.isEmpty()) {
@@ -185,7 +185,6 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         ivBabyImage=v.findViewById(R.id.ivBabyImage);
         tvDevelopment=v.findViewById(R.id.tvDevelopment);
         tvWeeklyTip=v.findViewById(R.id.tvWeeklyTip);
-
 
 
         Log.d("MARIELA","current week: "+Integer.toString(week));
