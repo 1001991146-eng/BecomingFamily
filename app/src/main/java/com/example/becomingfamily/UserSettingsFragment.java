@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,6 +42,7 @@ public class UserSettingsFragment extends Fragment {
     private ExtendedFloatingActionButton fabEMom, fabEDad;
     private TextInputEditText etEFullName,etEEmailRegister,etEMobile,etERegisterPassword,etEConfirmPassword,etEOriginalRegisterPassword;
     private Button btnEdit,btnELogout,btnEDelete,btnTrack;
+    private TextView tvSavesDates;
     private User user;
     private int week;
     private int days;
@@ -325,6 +327,7 @@ public class UserSettingsFragment extends Fragment {
         btnEDelete=v.findViewById(R.id.btnEDelete);
         btnTrack=v.findViewById(R.id.btnTrack);
         etEOriginalRegisterPassword=v.findViewById(R.id.etEOriginalRegisterPassword);
+        tvSavesDates=v.findViewById(R.id.tvSavesDates);
 
         if (user.getRole().equals("Mom"))
         {
@@ -341,6 +344,9 @@ public class UserSettingsFragment extends Fragment {
         etEFullName.setText(user.getFullName());
         etEEmailRegister.setText(user.getEmail());
         etEMobile.setText(user.getPhone());
+        String lastPeriod=user.getLastPeriodDate().getDay()+"/"+user.getLastPeriodDate().getMonth()+"/"+user.getLastPeriodDate().getYear();
+        String estimatedDate=user.getEstimatedDate().getDay()+"/"+user.getEstimatedDate().getMonth()+"/"+user.getEstimatedDate().getYear();
+        tvSavesDates.setText("תאריך מחזור אחרון: "+lastPeriod+"\n תאריך לידה משוער: "+estimatedDate);
         fabEDad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
