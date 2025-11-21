@@ -1,4 +1,7 @@
 package com.example.becomingfamily;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.google.ai.client.generativeai.GenerativeModel;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.Content;
@@ -45,6 +48,8 @@ public class GeminiPrompt {
                     @Override
                     public void onFailure(Throwable t) {
                         // מריץ את ה-Callback של הכשל
+                        Log.d("MARIELA","Gemini Failure "+t.getMessage());
+
                         listener.onGeminiFailure(t.getMessage());
                     }
                 },

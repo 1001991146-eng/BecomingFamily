@@ -34,7 +34,6 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
     private int days;
     private Activity activity;
     private TextView tvBabySize;
-    private TextView tvGeminiInfo;
     private ImageView ivBabyImage;
     private TextView tvDevelopment; // חדש
     private TextView tvWeeklyTip; // חדש
@@ -67,7 +66,7 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
                  splitGeminiResponse(rawResponse);
 
                 } catch (Exception e) {
-                    tvGeminiInfo.setText("שגיאה בעיבוד התוכן.");
+                    tv_Baby_Weeks.setText("שגיאה בעיבוד התוכן.");
                 }
             });
         }
@@ -79,8 +78,13 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                tv_Baby_Weeks.setText("שגיאת רשת/API. לא ניתן לטעון מידע .");
-
+                if(errorMessage.contains("Quota exceeded"))
+                {
+                    tv_Baby_Weeks.setText("הגעת למגבלת השימוש היומית. ניתן להמשיך מחר.");
+                }
+                else {
+                    tv_Baby_Weeks.setText("שגיאת רשת/API. לא ניתן לטעון מידע .");
+                }
             });
         }
     }
@@ -179,7 +183,6 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         tv_Baby_Weeks = v.findViewById(R.id.tv_Baby_Weeks);
         tvBabySize=v.findViewById(R.id.tvBabySize);
         ivBabyImage=v.findViewById(R.id.ivBabyImage);
-        tvGeminiInfo=v.findViewById(R.id.tvGeminiInfo);
         tvDevelopment=v.findViewById(R.id.tvDevelopment);
         tvWeeklyTip=v.findViewById(R.id.tvWeeklyTip);
 
@@ -189,11 +192,11 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         String prompt = String.format(
                 "אתה יועץ הריון, מומחה להתפתחות עוברית, בעל נימה חיובית ומעודדת. ענה במקצועיות והתמקד אך ורק בתינוק."+
-                "ספק סיכום מקיף על התפתחות העובר בשבוע %d יום %d. " +
+                        "ספק סיכום מקיף על התפתחות העובר בשבוע %d יום %d. " +
                         "**חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
                         "שלושת הסעיפים הם:\n" +
-                        "1. **גודלו של התינוק**: תאר את גודלו של העובר במונחי משקל ואורך (בערך), והשווה אותו לפרי נפוץ אחד. \n" +
-                        "2. **התפתחות העובר בשבוע זה**: פרט את השינויים הגופניים והתפקודיים המרכזיים שחלים בעובר בשבוע זה. **השתמש בנקודות בולטות (-) לכל שינוי או איבר מרכזי.** \n" + // <--- הוספת הדרישה לבולטים כאן
+                        "1. **גודלו של התינוק**: תאר את גודלו של העובר במונחי משקל ואורך (בערך), והשווה אותו לפרי נפוץ אחד. **חובה לכתוב סעיף זה כפסקה רציפה אחת. אסור שיופיעו בו אף סימני רשימה, תבליטים, קווים או נקודות כלשהם.**\n" +
+                        "2. **התפתחות העובר בשבוע זה**: פרט את השינויים הגופניים והתפקודיים המרכזיים שחלים בעובר בשבוע זה. **השתמש בכוכביות בולטות (*) לכל שינוי או איבר מרכזי. לדוגמה: * התפתחות הלב.**\n" + // <--- שינוי קריטי: מעבר לשימוש בכוכביות (*)
                         "3. **טיפים שבועיים**: ספק עצה מעשית קצרה ורלוונטית לשבוע זה (למשל, עצה לתמיכה רגשית או משהו שאפשר לנסות בבית). \n" +
                         "המידע חייב להתמקד אך ורק בעובר ובטיפים כלליים/רלוונטיים לשבוע זה.",
                 week,

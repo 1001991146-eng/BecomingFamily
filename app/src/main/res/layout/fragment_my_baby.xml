@@ -16,7 +16,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
+            <TextView
+                android:id="@+id/tv_Baby_Weeks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:paddingBottom="16dp"
+                android:text="Your baby" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -131,24 +138,6 @@
                         tools:text="כאן יופיע טיפ ממוקד."/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-            <TextView
-                android:id="@+id/tv_Baby_Weeks"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:paddingBottom="16dp"
-                android:text="Your baby" />
-            <TextView
-                android:id="@+id/tvGeminiInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="17sp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="@android:color/black"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                tools:text="כאן יופיע כל הטקסט הארוך והמעוצב של Gemini המחולק לסעיפים." />
 
 
         </LinearLayout>
