@@ -15,8 +15,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvForgotPassword,tvGoRegister,tvError;
     private ExtendedFloatingActionButton fabLogin;
     private  CurrentData currentData;
+    private FirebaseAuth mAuth; // משתנה להתחברות
     private FirebaseDatabase database;
     private DatabaseReference userRef; // A reference to the root or a specific path
     public User user;
@@ -46,12 +49,13 @@ public class LoginActivity extends AppCompatActivity {
         tvGoRegister.setPaintFlags(tvGoRegister.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
         fabLogin=findViewById(R.id.fabLogin);
         // firebase init
+        mAuth = FirebaseAuth.getInstance(); // אתחול Auth
         database = FirebaseDatabase.getInstance();
         userRef = database.getReference("Users");
 
         // init loged in user data
         currentData=new CurrentData();// email
-        user=new User(); // create empty user data
+        user=UserManager.getInstance(); // create empty user data
 
         tvError.setText("");
     }
@@ -74,9 +78,9 @@ public class LoginActivity extends AppCompatActivity {
     public CurrentData SavePreviousUser(String email)
     {
         currentData.SetEmail(email);
-        SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(MyConstants.SHARED_PREFS_FILE, MODE_PRIVATE);
         SharedPreferences.Editor editor= sp.edit();
-        editor.putString("email",currentData.GetEmail());
+        editor.putString(MyConstants.KEY_EMAIL,currentData.GetEmail());
         editor.commit();
         return  currentData;
     }
@@ -92,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 // snapshot הוא ה-UID של המשתמש (למשל, Q6SS...)
                                 User user = snapshot.getValue(User.class);
-
+                                UserManager.setInstance(user); // את שומרת אותו במנהל
                                 if (user != null) {
                                     Log.d("MARIELA", "Retrieved user: " + user.toString());
                                     tvError.setText("User retrieved successfully.");
@@ -122,8 +126,8 @@ public class LoginActivity extends AppCompatActivity {
 /* load previous loged in user from shared prefferences*/
     public void LoadCurrentData()
     {
-        SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
-        String email= sp.getString("email", "");
+        SharedPreferences sp=getSharedPreferences(MyConstants.SHARED_PREFS_FILE,MODE_PRIVATE);
+        String email= sp.getString(MyConstants.KEY_EMAIL, "");
         etEmail.setText(email);
     }
 
@@ -139,29 +143,23 @@ public class LoginActivity extends AppCompatActivity {
         fabLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email=etEmail.getText().toString();
-                String password=etPassword.getText().toString();
-                Log.d("MARIELA","Login "+email);
+                String email = etEmail.getText().toString();
+                String password = etPassword.getText().toString();
                 if (verifyData()) {
-                    Auth.signIn(LoginActivity.this, email, password, task -> {
-                        if (task.isSuccessful()) {
-                            tvError.setText("Login succeded.");
-                            currentData = SavePreviousUser(email);
-                            LoadUserFromDBS();
-                            Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-
-
-
-                        } else {
-                            tvError.setText(task.getException().getMessage());
-                            Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-                else {
-                    Toast.makeText(LoginActivity.this, "Login Failed. " , Toast.LENGTH_SHORT).show();
-                    tvError.setText("Login Failed.");
-
+                    // ✅ תיקון קריטי בתחביר של Firebase!
+                    // הפונקציה signIn מקבלת רק מייל וסיסמה, וה-Listener מגיע בנפרד.
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(LoginActivity.this, task -> {
+                                if (task.isSuccessful()) {
+                                    tvError.setText("Login succeded.");
+                                    SavePreviousUser(email);
+                                    LoadUserFromDBS(); // זה יפעיל את המעבר למסך הבא
+                                } else {
+                                    String err = task.getException() != null ? task.getException().getMessage() : "Error";
+                                    tvError.setText(err);
+                                    Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 }
             }
         });
