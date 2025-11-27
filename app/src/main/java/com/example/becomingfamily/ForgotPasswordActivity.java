@@ -1,11 +1,5 @@
 package com.example.becomingfamily;
-
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.telephony.SmsManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
@@ -13,37 +7,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.Random;
-
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private EditText et_reset_email;
     private Button btn_reset_password;
-    private  CurrentData currentData;
-    public User user;
-    private FirebaseDatabase database;
-    private DatabaseReference userRef; // A reference to the root or a specific path
     private FirebaseAuth auth;
     private ProgressBar progressBar;
 
@@ -52,11 +28,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         et_reset_email=findViewById(R.id.et_reset_email);
         btn_reset_password=findViewById(R.id.btn_reset_password);
-        // init loged in user data
-        currentData=new CurrentData();// email
-        user=new User(); // create empty user data*/
-        auth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progress_bar_reset);
+
+        // init loged in user data
+        auth = FirebaseAuth.getInstance();
 
     }
     private void resetPassword() {
