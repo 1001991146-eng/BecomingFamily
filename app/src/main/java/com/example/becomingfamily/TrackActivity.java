@@ -72,6 +72,12 @@ public class TrackActivity extends AppCompatActivity {
      */
     public void processLastPeriodDate(User user) {
         Log.d("MARIELA", "processLastPeriodDate");
+        if (user == null) {
+            Log.e("MARIELA", "User object is NULL inside processLastPeriodDate! preventing crash.");
+            // אופציונלי: אפשר לאתחל את calendar לברירת מחדל
+            calendar = Calendar.getInstance();
+            return; // יוצאים מהפונקציה מיד כדי לא לקרוס
+        }
         // נניח ש-getLastPeriodDate מחזיר LastPeriodDate{day=X, month=Y, year=Z}
         LastPeriodDate lastPeriodDate = user.getLastPeriodDate();
 
@@ -295,7 +301,14 @@ public class TrackActivity extends AppCompatActivity {
         // **אם ה-user לא נטען עדיין, יש להוסיף כאן לוגיקת טעינה**
         // לדוגמה: LoadUserAndProcessData();
 
-        processLastPeriodDate(UserManager.getInstance()); // עדיין מניח שה-user מכיל את הנתונים הנחוצים
+        User user= UserManager.getInstance();
+        if (user == null) {
+            Log.e("MARIELA", "User object is NULL inside processLastPeriodDate! preventing crash.");
+            // אופציונלי: אפשר לאתחל את calendar לברירת מחדל
+            calendar = Calendar.getInstance();
+            return; // יוצאים מהפונקציה מיד כדי לא לקרוס
+        }
+        processLastPeriodDate(user); // עדיין מניח שה-user מכיל את הנתונים הנחוצים
 
         tv_selected_date.setOnClickListener(new View.OnClickListener() {
             @Override
