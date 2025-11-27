@@ -1,12 +1,13 @@
+import java.util.Properties // חובה להוסיף את הייבוא הזה בהתחלה!
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
-
 }
 
 android {
     namespace = "com.example.becomingfamily"
-    compileSdk = 36
+    compileSdk = 36 // מומלץ להישאר על 34 או 35 (36 עדיין נסיוני)
 
     defaultConfig {
         applicationId = "com.example.becomingfamily"
@@ -14,13 +15,25 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        buildFeatures {
-            buildConfig = true
-        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String","GEMINI_API_KEY","\"AIzaSyCOCL7BC0VnET6Jd41TE9axrSOrj43unZA\"")
 
+        // --- קוד מתוקן ל-Kotlin DSL ---
+        val properties = Properties()
+        val localPropertiesFile = project.rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            properties.load(localPropertiesFile.inputStream())
+        }
+
+        // שליפת המפתח בצורה בטוחה
+        val apiKey = properties.getProperty("apiKey") ?: ""
+        buildConfigField("String", "GEMINI_API_KEY", "\"$apiKey\"")
+        // ------------------------------
+    }
+
+    // הבלוק הזה יושב במקום הנכון עכשיו!
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
