@@ -1,7 +1,10 @@
 package com.example.becomingfamily;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +12,8 @@ import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -31,13 +36,21 @@ public class MainActivity extends AppCompatActivity {
     /* show progress on pregnancy by shared prefferences */
     public void getPrevDataSaved()
     {
-        SharedPreferences sp=getSharedPreferences("BabySteps",MODE_PRIVATE);
-        int weeks= sp.getInt("weeks",1);
+        SharedPreferences sp=getSharedPreferences(MyConstants.SHARED_PREFS_FILE,MODE_PRIVATE);
+        int weeks= sp.getInt(MyConstants.KEY_WEEKS,1);
         Log.d("MARIELA","Show week "+Integer.toString(weeks));
         progressBar.setProgress(weeks);
     }
 
-
+    private void askNotificationPermission() {
+        // בודק אם גרסת האנדרואיד היא 13 (Tiramisu) ומעלה
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // אם אין הרשאה - מבקש אותה מהמשתמש
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
         init();
         getPrevDataSaved();
-
+// 2. בקשת הרשאה להתראות (קריטי ל-JobService!)
+        askNotificationPermission();
         fabStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
