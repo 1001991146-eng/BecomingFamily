@@ -60,7 +60,7 @@ public class UserSettingsFragment extends Fragment {
         this.week=week;
         this.days=days;
         this.context=context;
-        user=new User();
+        user=UserManager.getInstance();
 
         database = FirebaseDatabase.getInstance();
         userRef = database.getReference("Users");
@@ -76,7 +76,7 @@ public class UserSettingsFragment extends Fragment {
             return;
         }
 
-        final String email = user.getEmail();
+        final String email = UserManager.getInstance().getEmail();
         AuthCredential credential = EmailAuthProvider.getCredential(email, password);
 
         // שלב 1: אימות מחדש (Re-authenticate)
@@ -233,10 +233,12 @@ public class UserSettingsFragment extends Fragment {
         if (verifyUser())
         {
             String uid=Auth.getCurrentUser().getUid();
+            user=UserManager.getInstance();
             user.setFullName(etEFullName.getText().toString());
             user.setEmail(etEEmailRegister.getText().toString());
             user.setPhone(etEMobile.getText().toString());
             user.setRole(newRole);
+            UserManager.setInstance(user);
             // verify old passord
             // 1. יצירת Credential מהסיסמה הישנה
             AuthCredential credential = EmailAuthProvider.getCredential(
@@ -421,6 +423,8 @@ public class UserSettingsFragment extends Fragment {
 // IF YES
 
                         Auth.signOut();
+                        // בפונקציה של כפתור ההתנתקות:
+                        UserManager.clear();
                         Intent intent=new Intent(context,MainActivity.class);
                         startActivity(intent);
                     }
