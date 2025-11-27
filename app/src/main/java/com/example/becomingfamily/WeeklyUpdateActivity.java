@@ -91,7 +91,8 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         // נניח ש-user הוא אובייקט User המעודכן
         if (user == null || user.getLastPeriodDate() == null) {
             Log.e("MARIELA", "User is null in calculateCurrentWeek");
-
+            week=1;
+            days=1;
             return ; // טיפול במקרה של נתונים חסרים
         }
         LastPeriodDate last = UserManager.getInstance().getLastPeriodDate();
