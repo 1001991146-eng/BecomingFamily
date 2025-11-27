@@ -1,6 +1,7 @@
 package com.example.becomingfamily;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -55,8 +56,15 @@ public class TrackActivity extends AppCompatActivity {
         // connect to firebase
         database = FirebaseDatabase.getInstance();
         userRef = database.getReference("Users");
-        user = new User(); // ודא שאתה ממלא את שדה ה-email של user לפני השימוש ב-UpdateUser
-        Log.d("MARIELA", "user:" + user.toString());
+        user = UserManager.getInstance(); // ודא שאתה ממלא את שדה ה-email של user לפני השימוש ב-UpdateUser
+        // 🛡️ הגנה 1: האם בכלל יש משתמש?
+        if (user == null) {
+            Log.e("MARIELA", "User is null in calculateCurrentWeek");
+            return;
+        }
+        else {
+            Log.d("MARIELA", "user:" + user.toString());
+        }
     }
 
     /**
@@ -156,7 +164,25 @@ public class TrackActivity extends AppCompatActivity {
 
         return (int) (diffInDays % 7);
     }
+    public long getLPD() {
+        Calendar calendar = Calendar.getInstance();
+        User user=UserManager.getInstance();
 
+        // שימו לב: חודשים ב-Calendar מתחילים מ-0 (0=ינואר, 11=דצמבר)
+        // לכן אנחנו מפחיתים 1 מהחודש ששמרתם.
+        calendar.set(user.getLastPeriodDate().getYear(), user.getLastPeriodDate().getMonth() - 1, user.getLastPeriodDate().getDay(), 0, 0, 0); // 0,0,0 = חצות
+
+        return calendar.getTimeInMillis();
+    }
+    private void saveLMPDate(long lmpMillis) {
+
+        SharedPreferences prefs = getSharedPreferences(MyConstants.SHARED_PREFS_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        // זה המפתח ששומר את תאריך ההתחלה!
+        editor.putLong(MyConstants.KEY_LMP_DATE, lmpMillis);
+        editor.apply();
+    }
     /**
      * מבצע את החישוב המלא, מעדכן את Firebase ומחזיר את המחרוזת ל-UI.
      */
@@ -195,6 +221,9 @@ public class TrackActivity extends AppCompatActivity {
         // 4. עדכון Firebase
         UpdateUser(lastPeriodDateToSave, estimatedDateToSave);
 
+        // שמירה ב shared prefferences
+        saveLMPDate(calendar.getTimeInMillis());
+
         // 5. הרכבת התוצאה
         return String.format(
                 Locale.getDefault(),
@@ -208,9 +237,9 @@ public class TrackActivity extends AppCompatActivity {
     // ... שאר המתודות (SaveCurrentData, UpdateUser) נשארות כפי שהן ...
 
     public void SaveCurrentData(int week) {
-        SharedPreferences sp = getSharedPreferences("BabySteps", MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(MyConstants.SHARED_PREFS_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("weeks", week);
+        editor.putInt(MyConstants.KEY_WEEKS, week);
         editor.commit();
     }
 
@@ -229,6 +258,7 @@ public class TrackActivity extends AppCompatActivity {
                                 if (userToUpdate != null) {
                                     userToUpdate.setLastPeriodDate(lastPeriodDate);
                                     userToUpdate.setEstimatedDate(estimatedDate);
+                                    UserManager.setInstance(userToUpdate);
 
                                     snapshot.getRef().setValue(userToUpdate) // משתמשים באובייקט המעודכן
                                             .addOnSuccessListener(aVoid -> {
@@ -265,7 +295,7 @@ public class TrackActivity extends AppCompatActivity {
         // **אם ה-user לא נטען עדיין, יש להוסיף כאן לוגיקת טעינה**
         // לדוגמה: LoadUserAndProcessData();
 
-        processLastPeriodDate(user); // עדיין מניח שה-user מכיל את הנתונים הנחוצים
+        processLastPeriodDate(UserManager.getInstance()); // עדיין מניח שה-user מכיל את הנתונים הנחוצים
 
         tv_selected_date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -277,7 +307,7 @@ public class TrackActivity extends AppCompatActivity {
         btn_LetsGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LastPeriodDate lastPeriodDate = user.getLastPeriodDate();
+                LastPeriodDate lastPeriodDate = UserManager.getInstance().getLastPeriodDate();
                 if (lastPeriodDate!=null)
                 {
                     Intent intent=new Intent(TrackActivity.this, WeeklyUpdateActivity.class);
