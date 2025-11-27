@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class User {
 
-    private static String fullName;
-    private static String email;
-    private static String uid;
-    private static LastPeriodDate lastPeriodDate;
-    private static String role;
-    private static EstimatedDate estimatedDate;
-    public static String phone;
+    private  String fullName;
+    private  String email;
+    private  String uid;
+    private  LastPeriodDate lastPeriodDate;
+    private  String role;
+    private  EstimatedDate estimatedDate;
+    public  String phone;
     public User()
     {
 
@@ -75,7 +75,8 @@ public class User {
     }
 
     public void setPhone(String phone) {
-        User.phone = phone;
+
+        this.phone = phone;
     }
 
     @Override
