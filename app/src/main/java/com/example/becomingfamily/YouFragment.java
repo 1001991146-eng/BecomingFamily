@@ -39,7 +39,10 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
             "**כיצד לתמוך באמא**",
             "**טיפ זוגי לשבוע זה**"
     };
+    public YouFragment()
+    {
 
+    }
     public YouFragment(Activity activity, int week, int days, String role) {
         // Required empty public constructor
         this.week=week;

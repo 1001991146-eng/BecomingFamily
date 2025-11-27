@@ -54,7 +54,9 @@ public class UserSettingsFragment extends Fragment {
     private FirebaseAuth mAuth; // חשוב!
     private FirebaseUser firebaseUser; // חשוב!
     public static final String BABY_FRAGMENT_TAG = "my_baby_fragment"; // תג קבוע
-
+    public UserSettingsFragment() {
+        // Required empty public constructor
+    }
     public UserSettingsFragment(Context context, int week, int days) {
         // Required empty public constructor
         this.week=week;

@@ -38,6 +38,9 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
     private TextView tvWeeklyTip; // חדש
 
     private TextView tv_Baby_Weeks;
+    public MyBabyFragment() {
+        // Required empty public constructor
+    }
     public MyBabyFragment(Activity activity, int week, int days) {
         // Required empty public constructor
         this.week=week;

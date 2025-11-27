@@ -32,6 +32,9 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
             "**כיצד להבין את התוצאות**",
             "**הבדיקות הבאות**"
     };
+    public TestsFragment() {
+        // Required empty public constructor
+    }
     public TestsFragment(Activity activity,int week,int days) {
         // Required empty public constructor
         this.week=week;
