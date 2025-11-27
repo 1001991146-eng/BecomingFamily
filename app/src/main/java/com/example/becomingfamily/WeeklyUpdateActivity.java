@@ -1,6 +1,10 @@
 package com.example.becomingfamily;
 
 import androidx.appcompat.app.AlertDialog;
+
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -81,13 +85,16 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
 
     }
     public void calculateCurrentWeek() {
-         user=new User();
+         user=UserManager.getInstance();
+
         Log.d("MARIELA","calculateCurrentWeek");
         // נניח ש-user הוא אובייקט User המעודכן
         if (user == null || user.getLastPeriodDate() == null) {
+            Log.e("MARIELA", "User is null in calculateCurrentWeek");
+
             return ; // טיפול במקרה של נתונים חסרים
         }
-        LastPeriodDate last = user.getLastPeriodDate();
+        LastPeriodDate last = UserManager.getInstance().getLastPeriodDate();
         // 1. יצירת אובייקט Calendar
         Calendar lastPeriodCal = Calendar.getInstance();
         // 2. הגדרת התאריך הנכון:
@@ -109,7 +116,51 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         days=(int) (diffInDays % 7);
 
     }
+    public void scheduleReminderJob() {
+        // ID ייחודי לעבודה שלך
+        int jobId = 101;
 
+        // מכינים את ה-JobInfo
+        ComponentName serviceComponent = new ComponentName(this, MyReminderJobService.class);
+        JobInfo.Builder builder = new JobInfo.Builder(jobId, serviceComponent);
+
+        // *הגדרת החזרתיות:*
+        // JobScheduler לא תומך ב"הפעלה פעם בחודש".
+        // הפתרון המקובל הוא להשתמש ב-setPeriodic עם הזמן המינימלי
+        // (למשל, 24 שעות) ואז **בתוך ה-JobService** לבדוק אם עבר חודש!
+
+        // נניח, הפעלה כל 24 שעות (86400000 מילישניות):
+        long intervalMillis = 24 * 60 * 60 * 1000L;
+        builder.setPeriodic(intervalMillis);
+
+        // הגדרות נוספות מומלצות:
+        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY); // אפשר להגדיר תנאים
+        builder.setPersisted(true); // אם המכשיר אתחל מחדש, ה-Job יישמר.
+
+        JobScheduler jobScheduler =
+                (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+        int result = jobScheduler.schedule(builder.build());
+
+        if (result == JobScheduler.RESULT_SUCCESS) {
+            // סמיילי פייס: "המשימה נכנסה לתור בהצלחה! 💪"
+            Log.d("MARIELA","Scheduling service succeded");
+
+        } else {
+            // המבאס: "איזה באסה, משהו נכשל ב-Scheduling..."
+            Log.d("MARIELA","Scheduling service failed");
+        }
+    }
+    public long getLPD() {
+        Calendar calendar = Calendar.getInstance();
+        User user=UserManager.getInstance();
+
+        // שימו לב: חודשים ב-Calendar מתחילים מ-0 (0=ינואר, 11=דצמבר)
+        // לכן אנחנו מפחיתים 1 מהחודש ששמרתם.
+        calendar.set(UserManager.getInstance().getLastPeriodDate().getYear(), UserManager.getInstance().getLastPeriodDate().getMonth() - 1, UserManager.getInstance().getLastPeriodDate().getDay(), 0, 0, 0); // 0,0,0 = חצות
+
+        return calendar.getTimeInMillis();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,6 +169,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         Log.d("MARIELA","WeeklyUpdateActivity");
 
         init();
+        scheduleReminderJob();
         connectivityReceiver = new ConnectivityReceiver();
 
         babyFragment=new MyBabyFragment(WeeklyUpdateActivity.this,week,days);
@@ -142,7 +194,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         btn_my_life.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                youFragment=new YouFragment(WeeklyUpdateActivity.this,week,days,user.getRole());
+                youFragment=new YouFragment(WeeklyUpdateActivity.this,week,days,UserManager.getInstance().getRole());
                 FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, youFragment);
                 ft.addToBackStack(YOU_FRAGMENT_TAG); // הוספת התג כ'שם' לערימה
