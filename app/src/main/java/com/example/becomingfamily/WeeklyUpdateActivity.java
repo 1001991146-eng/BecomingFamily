@@ -113,7 +113,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
         // 5. חישוב שבוע ההיריון
         // כל 7 ימים הם שבוע שלם, מוסיפים 1 כדי להתחיל ספירה משבוע 1.
-        week= (int) (diffInDays / 7) + 1;
+        week= (int) (diffInDays / 7) ;
         days=(int) (diffInDays % 7);
 
     }

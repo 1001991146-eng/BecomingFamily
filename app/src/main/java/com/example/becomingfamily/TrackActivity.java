@@ -157,7 +157,7 @@ public class TrackActivity extends AppCompatActivity {
         long diffInMillies = today.getTime() - lastPeriodDate.getTime();
         long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
-        return (int) (diffInDays / 7) + 1;
+        return (int) (diffInDays / 7) ;
     }
 
     /** מחשב את מספר הימים לשבוע הבא (משתמש במשתנה calendar הגלובלי) */

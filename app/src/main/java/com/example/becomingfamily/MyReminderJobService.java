@@ -60,7 +60,7 @@ private int currentWeek;
         long totalDays = (nowMillis - lmpMillis) / (1000 * 60 * 60 * 24);
 
         // היריון מלא הוא 40 שבועות (280 ימים)
-        currentWeek = (int) (totalDays / 7) + 1;
+        currentWeek = (int) (totalDays / 7) ;
 
         // **שלב 3: בדיקה אם היום הוא יום תחילת השבוע (היום הקבוע)**
         // אם את מחשיבה את היום הראשון להיריון כיום ראשון של השבוע הראשון.
