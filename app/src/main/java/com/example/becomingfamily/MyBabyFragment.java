@@ -95,16 +95,19 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
     private void splitGeminiResponse(String rawText) {
         Log.d("MARIELA","splitGeminiResponse "+rawText);
             final String[] HEADERS = {
-                    "**גודלו של התינוק**",
-                    "**התפתחות העובר בשבוע זה**",
-                    "**טיפים שבועיים**" // כותרת חדשה
+                    "SECTION_SIZE_START",
+                    "SECTION_DEV_START",
+                    "SECTION_TIPS_START"
             };
+        //    Log.d("MARIELA_GEMINI","rawText:"+rawText);
+        //      Log.d("MARIELA_GEMINI","HEADERS:"+HEADERS);
 
             Map<String, String> sections = new HashMap<>();
 
             // *** 1. לולאת ה-Parsing לחילוץ המקטעים ***
             for (int i = 0; i < HEADERS.length; i++) {
                 String currentHeader = HEADERS[i];
+          //      Log.d("MARIELA_GEMINI","currentHeader:"+currentHeader);
                 String nextHeader = (i + 1 < HEADERS.length) ? HEADERS[i+1] : null;
 
                 int start = rawText.indexOf(currentHeader);
@@ -125,10 +128,14 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
                     String cleanText = sectionText.replace(currentHeader, "").trim();
                     String clean = cleanRawText(cleanText);
                     sections.put(currentHeader, clean);
+            //        Log.d("MARIELA_GEMINI","clean:"+clean);
                 }
+
             }
 
         String sizeText = sections.getOrDefault(HEADERS[0], "לא נמצא מידע גודל.");
+        //Log.d("MARIELA_GEMINI","sizeText:"+sizeText);
+
         tvBabySize.setText(android.text.Html.fromHtml(sizeText, android.text.Html.FROM_HTML_MODE_LEGACY));
 
 // דוגמה לחילוץ טקסט ההתפתחות:
@@ -147,19 +154,13 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         // 1. נסיר רווחים מיותרים ש-Gemini יכול להוסיף בתחילת השורה
         String cleaned = rawDevelopmentText.trim();
 
-        cleaned = rawDevelopmentText.replaceAll("###.*", "").trim();
-
-        // 2. החלף בולטים (כוכביות או מקפים) בשבירת שורה כפולה (<br><br>)
-        //    כדי להפריד ויזואלית כל נקודה (הוספת רווח לפני כדי למנוע הדבקות למילה קודמת)
-        //    הביטוי הרגולרי: ([*\\-][\\s*]) יחפש * או - ואחריהם רווח (בכמה מקומות בשורה)
+        // 2. החלף בולטים (כוכביות או מקפים) בשבירת שורה כפולה (<br>• )
         cleaned = cleaned.replaceAll("[*\\-][\\s*]", "<br>• ");
 
         // 3. החלף כותרות משנה מודגשות ע"י הוספת שבירת שורה לפניהן
-        //    כדי שהן לא יופיעו סמוך מדי לטקסט שמעליהן
-        //    הביטוי הרגולרי: (\\*\\*[^\\*]+\\*\\*) יחפש כל טקסט בין ** ל-**
         cleaned = cleaned.replaceAll("(\\*\\*[^\\*]+\\*\\*)", "<br><br><b>$1</b>");
 
-        // 4. סיום ניקוי: הסר את תגי ה-** סביב הכותרות (כדי למנוע כפילות בולטת)
+        // 4. סיום ניקוי: הסר את תגי ה-** סביב הכותרות
         cleaned = cleaned.replaceAll("\\*\\*", "");
 
         // 5. הסר את שבירת השורה אם נוצרה בתחילת הטקסט
@@ -193,13 +194,13 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         Log.d("MARIELA","current week: "+Integer.toString(week));
 
         String prompt = String.format(
-                "אתה יועץ הריון, מומחה להתפתחות עוברית, בעל נימה חיובית ומעודדת. ענה במקצועיות והתמקד אך ורק בתינוק."+
-                        "ספק סיכום מקיף על התפתחות העובר בשבוע %d יום %d. " +
-                        "**חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
-                        "שלושת הסעיפים הם:\n" +
-                        "1. **גודלו של התינוק**: תאר את גודלו של העובר במונחי משקל ואורך (בערך), והשווה אותו לפרי נפוץ אחד. **חובה לכתוב סעיף זה כפסקה רציפה אחת. אסור שיופיעו בו אף סימני רשימה, תבליטים, קווים או נקודות כלשהם.**\n" +
-                        "2. **התפתחות העובר בשבוע זה**: פרט את השינויים הגופניים והתפקודיים המרכזיים שחלים בעובר בשבוע זה. **השתמש בכוכביות בולטות (*) לכל שינוי או איבר מרכזי. לדוגמה: * התפתחות הלב.**\n" + // <--- שינוי קריטי: מעבר לשימוש בכוכביות (*)
-                        "3. **טיפים שבועיים**: ספק עצה מעשית קצרה ורלוונטית לשבוע זה (למשל, עצה לתמיכה רגשית או משהו שאפשר לנסות בבית). \n" +
+                "אתה יועץ הריון, מומחה להתפתחות עוברית, בעל נימה חיובית ומעודדת. ענה במקצועיות והתמקד אך ורק בתינוק."+                        "ספק סיכום מקיף על התפתחות העובר בשבוע %d יום %d. " +
+                        "**חובה לחלק את התשובה לשלושה סעיפים מדויקים. כל סעיף חייב להתחיל במזהה ייחודי ללא תוספות.** " +
+                        "המזהים הם: SECTION_SIZE_START, SECTION_DEV_START, SECTION_TIPS_START.\n" +
+                        "הסעיפים הם:\n" +
+                        "1. SECTION_SIZE_START: תאר את גודלו של העובר במונחי משקל ואורך (בערך), והשווה אותו לפרי נפוץ אחד. **חובה לכתוב סעיף זה כפסקה רציפה אחת. אסור שיופיעו בו אף סימני רשימה, תבליטים, קווים או נקודות כלשהם.**\n" +
+                        "2. SECTION_DEV_START: פרט את השינויים הגופניים והתפקודיים המרכזיים שחלים בעובר בשבוע זה. **השתמש בכוכביות בולטות (*) לכל שינוי או איבר מרכזי. לדוגמה: * התפתחות הלב.**\n" + // <--- שינוי קריטי: מעבר לשימוש בכוכביות (*)
+                        "3. SECTION_TIPS_START: ספק עצה מעשית קצרה ורלוונטית לשבוע זה (למשל, עצה לתמיכה רגשית או משהו שאפשר לנסות בבית). \n" +
                         "המידע חייב להתמקד אך ורק בעובר ובטיפים כלליים/רלוונטיים לשבוע זה.",
                 week,
                 days
