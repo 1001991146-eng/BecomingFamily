@@ -26,11 +26,12 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
     private TextView tvResultsHeader;
     private TextView tvResultsContent;
     private TextView tvUpcomingTestsContent;
-    // הגדרת כותרות קבועות ל-Parsing (חובה להתאים לפרומפט ב-PregnancyPromptGenerator)
+    
+    // Using stable identifiers
     private static final String[] HEADERS = {
-            "**הבדיקות הרלוונטיות לשבוע זה**",
-            "**כיצד להבין את התוצאות**",
-            "**הבדיקות הבאות**"
+            "SECTION_TESTS_START",
+            "SECTION_RESULTS_START",
+            "SECTION_UPCOMING_START"
     };
     public TestsFragment() {
         // Required empty public constructor
@@ -70,15 +71,16 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
         // יצירת הפרומפט וטעינת הנתונים
         String prompt = String.format(
                 "אתה יועץ רפואי הריוני. ספק מידע רפואי מדויק ומעודכן על הבדיקות הנדרשות בשבוע %d. " +
-                        "**חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד. " +
+                        "**חובה לחלק את התשובה לשלושה סעיפים מדויקים. כל סעיף חייב להתחיל במזהה ייחודי ללא תוספות.** " +
+                        "המזהים הם: SECTION_TESTS_START, SECTION_RESULTS_START, SECTION_UPCOMING_START.\n" +
                         "בכל סעיף חובה למלא תוכן רלוונטי ומפורט, ואסור בתכלית האיסור לכתוב 'אין מידע זמין'.**\n" +
                         "שלושת הסעיפים הם:\n" +
-                        "1. **הבדיקות הרלוונטיות לשבוע זה**: פרט אילו בדיקות רופא/משרד הבריאות ממליץ לבצע בשבוע זה. " +
+                        "1. SECTION_TESTS_START: פרט אילו בדיקות רופא/משרד הבריאות ממליץ לבצע בשבוע זה. " +
                         "**חובה להשתמש בנקודות בולטות (מקף: - ) לכל בדיקה או המלצה. אסור להשאיר מקף ריק או טקסט שאינו שלם לאחר המקף.**\n" +
-                        "2. **כיצד להבין את התוצאות**: הסבר באופן כללי מה אומרות תוצאות תקינות ומהן נקודות הדגל האדום שצריך לשים לב אליהן בבדיקות הנפוצות של השלב הזה. " +
+                        "2. SECTION_RESULTS_START: הסבר באופן כללי מה אומרות תוצאות תקינות ומהן נקודות הדגל האדום שצריך לשים לב אליהן בבדיקות הנפוצות של השלב הזה. " +
                         "**חובה לכתוב סעיף זה כרצף שלם של טקסט - פסקה רציפה אחת ללא הפסקות או קיטועים. " +
                         "אסור בתכלית האיסור להשתמש בסימני רשימה, תבליטים, קווים, מקפים (-), או כוכביות (*).**\n" +
-                        "3. **הבדיקות הבאות**: ספק הצצה קדימה לשבועות הבאים, ציין בקצרה אילו בדיקות מרכזיות מצפות לאם (למשל, סקירות, בדיקות סוכר). " +
+                        "3. SECTION_UPCOMING_START: ספק הצצה קדימה לשבועות הבאים, ציין בקצרה אילו בדיקות מרכזיות מצפות לאם (למשל, סקירות, בדיקות סוכר). " +
                         "**חובה לכתוב סעיף זה כרצף שלם של טקסט - פסקה רציפה אחת ללא הפסקות או קיטועים. " +
                         "אסור בתכלית האיסור להשתמש בסימני רשימה, תבליטים, קווים, מקפים (-), או כוכביות (*).**",
                 week
@@ -173,29 +175,21 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
         tvUpcomingTestsContent.setText(android.text.Html.fromHtml(content3, android.text.Html.FROM_HTML_MODE_LEGACY));
     }
 
-    // ********* פונקציית הניקוי המשותפת (שתיקנת והוכחה כיעילה) *********
     private String cleanRawText(String rawDevelopmentText) {
         if (rawDevelopmentText == null || rawDevelopmentText.isEmpty()) {
             return "אין מידע זמין.";
         }
 
-        // 1. הסר את כל המופעים של '###' ואת כל הטקסט שאחריהם (ניקוי סוף התגובה)
-        String cleaned = rawDevelopmentText.replaceAll("###.*", "").trim();
+        String cleaned = rawDevelopmentText.trim();
 
-        // 2. החלף בולטים (כוכביות או מקפים) בשבירת שורה כפולה (<br>• )
-        // הערה: נשתמש ב-trim() לאחר החלפה כדי לנקות רווח מיותר לפני • אם קיים
-        cleaned = cleaned.replaceAll("[*\\-][\\s*]", "<br>• ").trim();
+        cleaned = cleaned.replaceAll("[*\\-][\\s*]", "<br>• ");
 
-        // 3. החלף כותרות משנה מודגשות ע"י הוספת שבירת שורה לפניהן והדגשה
         cleaned = cleaned.replaceAll("(\\*\\*[^\\*]+\\*\\*)", "<br><br><b>$1</b>");
 
-        // 4. סיום ניקוי: הסר את תגי ה-** סביב הכותרות שנותרו
         cleaned = cleaned.replaceAll("\\*\\*", "");
 
-        // 5. הסר את שבירת השורה אם נוצרה בתחילת הטקסט
         if (cleaned.startsWith("<br>")) {
-            // החלף רק את המופע הראשון של <br>
-            cleaned = cleaned.replaceFirst("<br>", "").trim();
+            cleaned = cleaned.replaceFirst("<br>", "");
         }
 
         return cleaned;

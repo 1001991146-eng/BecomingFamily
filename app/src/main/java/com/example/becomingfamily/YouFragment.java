@@ -27,17 +27,17 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
     private TextView tvSection2Content;
     private TextView tvSection3Content;
 
-    // הגדרת כותרות קבועות ל-Parsing (חובה להתאים לכותרות שנשלחות לפרומפט)
+    // Using stable identifiers instead of markdown
     private static final String[] HEADERS_MOM = {
-            "**השינויים אצלך, אמא**",
-            "**איך להתמודד ולהתכונן**",
-            "**טיפ זוגי לשבוע זה**"
+            "SECTION_MOM_CHANGES_START",
+            "SECTION_MOM_COPING_START",
+            "SECTION_COUPLE_TIP_START"
     };
 
     private static final String[] HEADERS_DAD = {
-            "**תפקידך המרכזי בשבוע זה**",
-            "**כיצד לתמוך באמא**",
-            "**טיפ זוגי לשבוע זה**"
+            "SECTION_DAD_ROLE_START",
+            "SECTION_DAD_SUPPORT_START",
+            "SECTION_COUPLE_TIP_START"
     };
     public YouFragment()
     {
@@ -83,24 +83,26 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
         {
              prompt = String.format(
                     "ספק מידע על השינויים הפיזיים והרגשיים של האישה בשבוע %d יום %d. " +
-                            "**חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
-                            "שלושת הסעיפים הם:\n" +
-                            "1. **השינויים אצלך, אמא**: תאר את השינויים הפיזיים והרגשיים הנפוצים בשבוע זה. **חובה להשתמש בכוכביות בולטות (*) לכל שינוי או תסמין. לדוגמה: * בחילות מוגברות.**\n" +
-                            "2. **איך להתמודד ולהתכונן**: ספק עצות מעשיות להתמודדות עם תסמינים והכנות שרלוונטיות לשלב זה של ההריון (בדיקות, תזונה). **חובה לכתוב סעיף זה כפסקה רציפה אחת בלבד, המורכבת ממשפטים מלאים וזורמים. אסור בתכלית האיסור להשתמש בסימני רשימה, תבליטים, כוכביות, מקפים או כל צורת פיצול אחרת.**\n" +
-                            "3. **טיפ זוגי לשבוע זה**: ספק פעילות משותפת קצרה או עצה לחיזוק הקשר הזוגי בשבוע זה. **חובה לכתוב סעיף זה כפסקה רציפה אחת בלבד, המורכבת ממשפטים מלאים וזורמים. אסור בתכלית האיסור להשתמש בסימני רשימה, תבליטים, כוכביות, מקפים או כל צורת פיצול אחרת.**\n" +
+                            "**חובה לחלק את התשובה לשלושה סעיפים מדויקים. כל סעיף חייב להתחיל במזהה ייחודי ללא תוספות.** " +
+                            "המזהים הם: SECTION_MOM_CHANGES_START, SECTION_MOM_COPING_START, SECTION_COUPLE_TIP_START.\n" +
+                            "הסעיפים הם:\n" +
+                            "1. SECTION_MOM_CHANGES_START: תאר את השינויים הפיזיים והרגשיים הנפוצים בשבוע זה. **חובה להשתמש בכוכביות בולטות (*) לכל שינוי או תסמין. לדוגמה: * בחילות מוגברות.**\n" +
+                            "2. SECTION_MOM_COPING_START: ספק עצות מעשיות להתמודדות עם תסמינים והכנות שרלוונטיות לשלב זה של ההריון (בדיקות, תזונה). **חובה לכתוב סעיף זה כפסקה רציפה אחת בלבד, המורכבת ממשפטים מלאים וזורמים. אסור בתכלית האיסור להשתמש בסימני רשימה, תבליטים, כוכביות, מקפים או כל צורת פיצול אחרת.**\n" +
+                            "3. SECTION_COUPLE_TIP_START: ספק פעילות משותפת קצרה או עצה לחיזוק הקשר הזוגי בשבוע זה. **חובה לכתוב סעיף זה כפסקה רציפה אחת בלבד, המורכבת ממשפטים מלאים וזורמים. אסור בתכלית האיסור להשתמש בסימני רשימה, תבליטים, כוכביות, מקפים או כל צורת פיצול אחרת.**\n" +
                             "המידע חייב להיות חיובי, מעודד וספציפי לשבוע ההריון.",
                     week,
                     days
             );
         }
-        else {
+        else { // Dad
              prompt = String.format(
                     "ספק הנחיות ממוקדות לבן/בת הזוג (האב) לתמיכה באם בשבוע %d. " +
-                            "**חובה לחלק את התשובה לשלושה סעיפים מדויקים באמצעות כותרות בולטות (Markdown headers) בלבד.** " +
-                            "שלושת הסעיפים הם:\n" +
-                            "1. **תפקידך המרכזי בשבוע זה**: תאר מה הדרך הטובה ביותר לתמוך באמא מבחינה מעשית ורגשית. **השתמש בכוכביות בולטות (*) לכל נקודה מרכזית. לדוגמה: * שאל את האמא מה היא צריכה.**\n" +
-                            "2. **כיצד לתמוך באמא**: ספק רעיונות ספציפיים לתמיכה בתסמינים הנפוצים בשבוע זה (למשל, הקלה על בחילות, הכנת אוכל). **חובה לכתוב סעיף זה כפסקה רציפה אחת. אסור שיופיעו בו אף סימני רשימה, תבליטים, קווים או נקודות כלשהם.**\n" + // <--- דרישה לפסקה רציפה
-                            "3. **טיפ זוגי לשבוע זה**: ספק פעילות משותפת קצרה או עצה לחיזוק הקשר הזוגי בשבוע זה. **חובה לכתוב סעיף זה כפסקה רציפה אחת. אסור שיופיעו בו אף סימני רשימה, תבליטים, קווים או נקודות כלשהם.**\n" + // <--- דרישה לפסקה רציפה
+                            "**חובה לחלק את התשובה לשלושה סעיפים מדויקים. כל סעיף חייב להתחיל במזהה ייחודי ללא תוספות.** " +
+                            "המזהים הם: SECTION_DAD_ROLE_START, SECTION_DAD_SUPPORT_START, SECTION_COUPLE_TIP_START.\n" +
+                            "הסעיפים הם:\n" +
+                            "1. SECTION_DAD_ROLE_START: תאר מה הדרך הטובה ביותר לתמוך באמא מבחינה מעשית ורגשית. **השתמש בכוכביות בולטות (*) לכל נקודה מרכזית. לדוגמה: * שאל את האמא מה היא צריכה.**\n" +
+                            "2. SECTION_DAD_SUPPORT_START: ספק רעיונות ספציפיים לתמיכה בתסמינים הנפוצים בשבוע זה (למשל, הקלה על בחילות, הכנת אוכל). **חובה לכתוב סעיף זה כפסקה רציפה אחת. אסור שיופיעו בו אף סימני רשימה, תבליטים, קווים או נקודות כלשהם.**\n" + // <--- דרישה לפסקה רציפה
+                            "3. SECTION_COUPLE_TIP_START: ספק פעילות משותפת קצרה או עצה לחיזוק הקשר הזוגי בשבוע זה. **חובה לכתוב סעיף זה כפסקה רציפה אחת. אסור שיופיעו בו אף סימני רשימה, תבליטים, קווים או נקודות כלשהם.**\n" + // <--- דרישה לפסקה רציפה
                             "המידע חייב להיות חיובי, מעודד וספציפי לשבוע ההריון.",
                     week
             );
@@ -113,17 +115,16 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
         return v;
     }
     private void updateUIForRole(String role) {
-        String[] currentHeaders = role.equals("Mom") ? HEADERS_MOM : HEADERS_DAD;
-
+        // This method can be simplified or removed if headers are set dynamically or are static in the layout
         if (role.equals("Mom")) {
             tvTitle.setText(String.format("שבוע %d: הריון, הגוף והרגש", week));
+            tvSection1Header.setText("השינויים אצלך, אמא");
+            tvSection2Header.setText("איך להתמודד ולהתכונן");
         } else { // Dad
             tvTitle.setText(String.format("שבוע %d: תמיכה והכנה לבן/בת הזוג", week));
+            tvSection1Header.setText("תפקידך המרכזי בשבוע זה");
+            tvSection2Header.setText("כיצד לתמוך באמא");
         }
-
-        tvSection1Header.setText(currentHeaders[0].replaceAll("\\*\\*", ""));
-        tvSection2Header.setText(currentHeaders[1].replaceAll("\\*\\*", ""));
-        // tvSection3Header לא צריך עדכון כי הוא קבוע ("טיפ זוגי לשבוע זה")
     }
 
 
@@ -198,49 +199,36 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
                 }
 
                 String cleanText = sectionText.replace(currentHeader, "").trim();
-                // שימוש בפונקציית הניקוי המשותפת (או יצירת אחת ספציפית אם צריך)
+                // Using the same robust cleaning function
                 String finalCleanText = cleanRawText(cleanText);
                 sections.put(currentHeader, finalCleanText);
             }
         }
         // 2. עדכון ה-UI
 
-        // מקטע 1: שינויים/תפקיד
         String content1 = sections.getOrDefault(currentHeaders[0], "לא נמצא מידע.");
         tvSection1Content.setText(android.text.Html.fromHtml(content1, android.text.Html.FROM_HTML_MODE_LEGACY));
 
-        // מקטע 2: התמודדות/תמיכה
         String content2 = sections.getOrDefault(currentHeaders[1], "לא נמצא מידע.");
         tvSection2Content.setText(android.text.Html.fromHtml(content2, android.text.Html.FROM_HTML_MODE_LEGACY));
 
-        // מקטע 3: טיפ זוגי
         String content3 = sections.getOrDefault(currentHeaders[2], "לא נמצא טיפ זוגי.");
         tvSection3Content.setText(android.text.Html.fromHtml(content3, android.text.Html.FROM_HTML_MODE_LEGACY));
     }
-
-    // ********* פונקציית הניקוי המשותפת (כפי שתוקנה לאחרונה) *********
 
     private String cleanRawText(String rawDevelopmentText) {
         if (rawDevelopmentText == null || rawDevelopmentText.isEmpty()) {
             return "אין מידע זמין.";
         }
 
-        // 1. הסר את כל המופעים של '###' ואת כל הטקסט שאחריהם (ניקוי סוף התגובה)
-        String cleaned = rawDevelopmentText.replaceAll("###.*", "").trim();
+        String cleaned = rawDevelopmentText.trim();
 
-        // 2. החלף בולטים (כוכביות או מקפים) בשבירת שורה כפולה (<br>• )
         cleaned = cleaned.replaceAll("[*\\-][\\s*]", "<br>• ");
-
-        // 3. החלף כותרות משנה מודגשות ע"י הוספת שבירת שורה לפניהן והדגשה
-        // הוספנו <br><br> כדי ליצור הפרדה ויזואלית טובה יותר
         cleaned = cleaned.replaceAll("(\\*\\*[^\\*]+\\*\\*)", "<br><br><b>$1</b>");
-
-        // 4. סיום ניקוי: הסר את תגי ה-** סביב הכותרות שנותרו
         cleaned = cleaned.replaceAll("\\*\\*", "");
 
-        // 5. הסר את שבירת השורה אם נוצרה בתחילת הטקסט
         if (cleaned.startsWith("<br>")) {
-            cleaned = cleaned.replaceFirst("<br>", "").trim();
+            cleaned = cleaned.replaceFirst("<br>", "");
         }
 
         return cleaned;
