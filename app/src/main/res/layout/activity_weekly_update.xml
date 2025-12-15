@@ -35,13 +35,12 @@
             android:id="@+id/tvCurrentWeekHeader"
             android:layout_width="wrap_content"
             android:layout_height="41dp"
+            android:layout_marginStart="92dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="150dp"
-            android:layout_marginStart="20dp"
             android:text="שבוע 22"
             android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/imageView2"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ProgressBar
