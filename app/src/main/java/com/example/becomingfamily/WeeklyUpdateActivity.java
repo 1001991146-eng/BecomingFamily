@@ -7,6 +7,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -76,6 +77,11 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         progressBarHorizontal=findViewById(R.id.progressBarHorizontal);
 
         calculateCurrentWeek();
+
+        SharedPreferences sp = getSharedPreferences(MyConstants.SHARED_PREFS_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(MyConstants.KEY_WEEKS, week);
+        editor.commit();
         tvCurrentWeekHeader.setText("שבוע "+Integer.toString(week)+" ( יום "+days+" )");
         progressBarHorizontal.setProgress(week);
     }
@@ -100,6 +106,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
         week= (int) (diffInDays / 7) ;
         days=(int) (diffInDays % 7);
+
     }
 
     public void scheduleReminderJob() {
