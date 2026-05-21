@@ -4,16 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_soft"
+    android:layoutDirection="rtl"
     tools:context=".TestsFragment">
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:clipToPadding="false"
-        android:paddingBottom="80dp">
+        android:paddingTop="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,46 +28,46 @@
                 android:id="@+id/tv_Tests_Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="26sp"
-                android:textStyle="bold"
                 android:paddingBottom="16dp"
-                android:textColor="#1A237E"
-                android:textAlignment="center"
-                android:text="בדיקות והנחיות רפואיות" />
+                android:text="בדיקות והנחיות רפואיות"
+                android:textAlignment="viewStart"
+                android:textColor="@color/text_primary"
+                android:textSize="26sp"
+                android:textStyle="bold" />
 
             <!-- כרטיסייה 1: הבדיקות הרלוונטיות לשבוע זה -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:backgroundTint="#E8EAF6"> <!-- רקע כחול בהיר מאוד -->
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:backgroundTint="#E8EAF6">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:id="@+id/tvTestsHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="הבדיקות הרלוונטיות לשבוע זה"
+                        android:layout_marginBottom="8dp"
+                        android:text="🏥 הבדיקות לשבוע זה"
+                        android:textColor="#3F51B5"
                         android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp"
-                        android:textColor="#3F51B5" /> <!-- כחול ביניים -->
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvTestsContent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:lineSpacingExtra="4dp"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp"
-                        android:textColor="#212121"
-                        android:lineSpacingExtra="3dp"
-                        android:text="טוען מידע על בדיקות שגרתיות..."/>
+                        android:text="טוען מידע על בדיקות שגרתיות..." />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -72,36 +75,35 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:backgroundTint="#F3E5F5"> <!-- רקע סגול בהיר מאוד -->
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:backgroundTint="#F3E5F5">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:id="@+id/tvResultsHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="כיצד להבין את התוצאות"
+                        android:layout_marginBottom="8dp"
+                        android:text="🔍 הבנת התוצאות"
+                        android:textColor="#9C27B0"
                         android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp"
-                        android:textColor="#9C27B0" /> <!-- סגול ביניים -->
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvResultsContent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:lineSpacingExtra="4dp"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp"
-                        android:textColor="#212121"
-                        android:lineSpacingExtra="3dp"
-                        android:text="טוען מידע על פענוח תוצאות בדיקה..."/>
+                        android:text="טוען מידע על פענוח תוצאות בדיקה..." />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -109,34 +111,34 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
-                app:contentPadding="12dp"
-                android:backgroundTint="#E0F2F1"> <!-- רקע טורקיז בהיר -->
+                android:backgroundTint="#E0F2F1">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🗓️ הבדיקות המרכזיות הבאות"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"
+                        android:text="🗓️ מה מחכה לנו בהמשך?"
                         android:textColor="#009688"
-                        android:layout_marginBottom="4dp" />
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvUpcomingTestsContent"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="15sp"
-                        android:textColor="#3E2723"
-                        android:text="טוען מידע על בדיקות עתידיות..."/>
+                        android:lineSpacingExtra="4dp"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:text="טוען מידע על בדיקות עתידיות..." />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

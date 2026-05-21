@@ -1,128 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llTrack"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white"
+    android:background="@color/background_soft"
+    android:layoutDirection="rtl"
     android:padding="24dp"
-    android:id="@+id/llTrack"
-    >
+    tools:context=".TrackActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp">
-
-        <TextView
-            android:id="@+id/tv_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="קליטת נתוני הריון"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/darker_gray" />
-
-    </RelativeLayout>
-
-    <Space android:layout_width="match_parent" android:layout_height="24dp" />
-
-    <androidx.cardview.widget.CardView
+    <TextView
+        android:id="@+id/tv_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        app:cardCornerRadius="16dp"
+        android:layout_marginTop="16dp"
+        android:text="קליטת נתוני הריון"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvIllustration"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="40dp"
+        app:cardBackgroundColor="#FDF7F2"
+        app:cardCornerRadius="75dp"
         app:cardElevation="0dp"
-        android:backgroundTint="#F8F3EE"
-        android:layout_marginBottom="40dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_header">
 
         <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:padding="20dp"
-            android:src="@drawable/flower" android:contentDescription="איור פרח" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="30dp"
+            android:src="@drawable/flower"
+            android:contentDescription="איור פרח" />
     </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/tv_title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:text="בואי נתחיל! מתי הייתה הוסת האחרונה שלך?"
+        android:textAlignment="center"
+        android:textColor="@color/text_primary"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:textAlignment="center"
-        android:layout_marginBottom="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cvIllustration" />
 
     <TextView
         android:id="@+id/tv_description"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="נשתמש בתאריך זה כדי לחשב את תאריך הלידה המשוער שלך ושבוע ההריון."
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
-        android:textAlignment="center"
-        android:layout_marginBottom="40dp"
+        android:layout_marginTop="12dp"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp"/>
-
-    <TextView
-        android:id="@+id/tv_date_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="תאריך הוסת האחרונה"
+        android:paddingEnd="16dp"
+        android:text="נשתמש בתאריך זה כדי לחשב את תאריך הלידה המשוער שלך ושבוע ההריון."
+        android:textAlignment="center"
+        android:textColor="@color/text_secondary"
         android:textSize="14sp"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:id="@+id/rl_date_picker"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/teal_200"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="40dp"
         android:clickable="true"
-        android:focusable="true">
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_description">
 
-        <ImageView
-            android:id="@+id/iv_calendar_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/calendar"
-            app:tint="@android:color/black"
-            android:contentDescription="סמל יומן" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
-        <TextView
-            android:id="@+id/tv_selected_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:text="בחרי תאריך"
-            android:textSize="16sp"
-            android:textColor="@android:color/white" />
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/iv_calendar_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/calendar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/primary" />
 
+            <TextView
+                android:id="@+id/tv_selected_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="בחרי תאריך"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
     <TextView
+        android:id="@+id/tvEstematedDateLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tvEstematedDate"
-        android:text="1/1/2025"
-        />
-    <Button
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_LetsGo"
-        android:layout_gravity="center_horizontal"
-        android:text="בואו נתחיל"
-        android:backgroundTint="@color/teal_200"
-        />
+        android:layout_marginTop="16dp"
+        android:text="תאריך לידה משוער:"
+        android:textColor="@color/text_secondary"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@id/rl_date_picker"
+        app:layout_constraintTop_toBottomOf="@id/rl_date_picker"
+        tools:visibility="visible" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/tvEstematedDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/primary_dark"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/tvEstematedDateLabel"
+        app:layout_constraintStart_toEndOf="@id/tvEstematedDateLabel"
+        app:layout_constraintTop_toTopOf="@id/tvEstematedDateLabel"
+        tools:text="1/1/2025"
+        tools:visibility="visible" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/btn_LetsGo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="בואו נתחיל"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/primary"
+        app:cornerRadius="28dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,26 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="teal_200">#FF80CBC4</color>
 
+    <!-- Primary Colors -->
+    <color name="primary">#FF80CBC4</color>
+    <color name="primary_dark">#FF4DB6AC</color>
+    <color name="primary_light">#FFB2DFDB</color>
+
+    <!-- Accent Colors -->
+    <color name="accent">#FF81C784</color>
+
+    <!-- Backgrounds -->
+    <color name="background_soft">#F5F7F8</color>
+
+    <!-- Text -->
+    <color name="text_primary">#2C3E50</color>
+    <color name="text_secondary">#7F8C8D</color>
+
+    <!-- Legacy/Existing -->
+    <color name="teal_200">#FF80CBC4</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
 </resources>

@@ -42,7 +42,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
     private UserSettingsFragment userSettingsFragment;
     private TestsFragment testsFragment;
     private YouFragment youFragment;
-    private Button btn_growth, btn_my_life,btn_tests,btn_user_settings;
+    private View btn_growth, btn_my_life,btn_tests,btn_user_settings;
     private FirebaseDatabase database;
     private DatabaseReference userRef; // A reference to the root or a specific path
     public User user;
