@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -26,6 +28,8 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
     private TextView tvSection2Header;
     private TextView tvSection2Content;
     private TextView tvSection3Content;
+    private ProgressBar progressBar;
+    private ScrollView scrollView;
 
     // --- STATE MANAGEMENT FIX ---
     private boolean isDataLoaded = false;
@@ -70,11 +74,15 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
         tvSection2Header = v.findViewById(R.id.tvSection2Header);
         tvSection2Content = v.findViewById(R.id.tvSection2Content);
         tvSection3Content = v.findViewById(R.id.tvSection3Content);
+        progressBar = v.findViewById(R.id.progressBar);
+        scrollView = v.findViewById(R.id.scrollView);
 
         updateUIForRole(role);
 
         if (isDataLoaded) {
             updateUiWithLoadedData();
+            if (progressBar != null) progressBar.setVisibility(View.GONE);
+            if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
         } else {
             String prompt = "";
             if (role.equals("Mom"))
@@ -126,6 +134,8 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
 
     private void startGeminiLoading(String prompt) {
         Log.d("PARTNER_FRAG","Sending Prompt: " + prompt);
+        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+        if (scrollView != null) scrollView.setVisibility(View.GONE);
         new GeminiPrompt(prompt, this);
     }
 
@@ -134,6 +144,8 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
         isDataLoaded = true;
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
                 try {
                     parseAndSaveSections(rawResponse, role);
                     updateUiWithLoadedData();
@@ -156,6 +168,8 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
     public void onGeminiFailure(String errorMessage) {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
                 Log.e("PARTNER_FRAG", "API Error: " + errorMessage);
                 if(errorMessage.contains("Quota exceeded"))
                 {

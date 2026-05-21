@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -26,6 +28,8 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
     private TextView tvResultsHeader;
     private TextView tvResultsContent;
     private TextView tvUpcomingTestsContent;
+    private ProgressBar progressBar;
+    private ScrollView scrollView;
 
     // --- STATE MANAGEMENT FIX ---
     private boolean isDataLoaded = false;
@@ -62,9 +66,13 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
         tvResultsHeader = v.findViewById(R.id.tvResultsHeader);
         tvResultsContent = v.findViewById(R.id.tvResultsContent);
         tvUpcomingTestsContent = v.findViewById(R.id.tvUpcomingTestsContent);
+        progressBar = v.findViewById(R.id.progressBar);
+        scrollView = v.findViewById(R.id.scrollView);
 
         if (isDataLoaded) {
             updateUiWithLoadedData();
+            if (progressBar != null) progressBar.setVisibility(View.GONE);
+            if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
         } else {
             tvTitle.setText(String.format("בדיקות והנחיות רפואיות"));
             String prompt = String.format(
@@ -90,6 +98,8 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
     }
     private void startGeminiLoading(String prompt) {
         Log.d("TESTS_FRAG","Sending Prompt: " + prompt);
+        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+        if (scrollView != null) scrollView.setVisibility(View.GONE);
         new GeminiPrompt(prompt, this);
     }
 
@@ -98,6 +108,8 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
         isDataLoaded = true;
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
                 try {
                     parseAndSaveSections(rawResponse);
                     updateUiWithLoadedData();
@@ -114,6 +126,8 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
     public void onGeminiFailure(String errorMessage) {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
                 Log.e("TESTS_FRAG", "API Error: " + errorMessage);
                 if(errorMessage.contains("Quota exceeded"))
                 {

@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -23,6 +25,8 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
     private TextView tvDevelopment;
     private TextView tvWeeklyTip;
     private TextView tv_Baby_Weeks;
+    private ProgressBar progressBar;
+    private ScrollView scrollView;
 
     // --- STATE MANAGEMENT FIX ---
     private boolean isDataLoaded = false;
@@ -41,6 +45,8 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
     private void startGeminiLoading(String prompt) {
         Log.d("MARIELA", "Go!!!");
+        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+        if (scrollView != null) scrollView.setVisibility(View.GONE);
         new GeminiPrompt(prompt, this);
     }
 
@@ -51,6 +57,8 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
 
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
                 try {
                     // Parse the response and save the content
                     parseAndSaveGeminiResponse(rawResponse);
@@ -68,6 +76,8 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         Log.d("MARIELA", "onGeminiFailure!!!");
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
                 if (errorMessage.contains("Quota exceeded")) {
                     tv_Baby_Weeks.setText("הגעת למגבלת השימוש היומית. ניתן להמשיך מחר.");
                 } else {
@@ -137,11 +147,15 @@ public class MyBabyFragment extends Fragment implements GeminiResponseListener {
         ivBabyImage = v.findViewById(R.id.ivBabyImage);
         tvDevelopment = v.findViewById(R.id.tvDevelopment);
         tvWeeklyTip = v.findViewById(R.id.tvWeeklyTip);
+        progressBar = v.findViewById(R.id.progressBar);
+        scrollView = v.findViewById(R.id.scrollView);
 
         // --- THE ACTUAL FIX ---
         if (isDataLoaded) {
             // If data is already loaded, just update the UI
             updateUiWithLoadedData();
+            if (progressBar != null) progressBar.setVisibility(View.GONE);
+            if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
         } else {
             // Otherwise, start the loading process
             Log.d("MARIELA", "current week: " + Integer.toString(week));
