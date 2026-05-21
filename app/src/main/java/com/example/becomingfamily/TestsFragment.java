@@ -31,29 +31,19 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
     private ProgressBar progressBar;
     private ScrollView scrollView;
 
-    // --- STATE MANAGEMENT FIX ---
     private boolean isDataLoaded = false;
     private String testsContent, resultsContent, upcomingContent;
-    // --------------------------
 
     private static final String[] HEADERS = {
             "SECTION_TESTS_START",
             "SECTION_RESULTS_START",
             "SECTION_UPCOMING_START"
     };
-    public TestsFragment() {
-        // Required empty public constructor
-    }
+    public TestsFragment() {}
     public TestsFragment(Activity activity,int week,int days) {
         this.week=week;
         this.activity=activity;
         this.days=days;
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -74,30 +64,14 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
             if (progressBar != null) progressBar.setVisibility(View.GONE);
             if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
         } else {
-            tvTitle.setText(String.format("בדיקות והנחיות רפואיות"));
-            String prompt = String.format(
-                    "אתה יועץ רפואי הריוני. ספק מידע רפואי מדויק ומעודכן על הבדיקות הנדרשות בשבוע %d. " +
-                            "**חובה לחלק את התשובה לשלושה סעיפים מדויקים. כל סעיף חייב להתחיל במזהה ייחודי ללא תוספות.** " +
-                            "המזהים הם: SECTION_TESTS_START, SECTION_RESULTS_START, SECTION_UPCOMING_START.\n" +
-                            "בכל סעיף חובה למלא תוכן רלוונטי ומפורט, ואסור בתכלית האיסור לכתוב 'אין מידע זמין'.**\n" +
-                            "שלושת הסעיפים הם:\n" +
-                            "1. SECTION_TESTS_START: פרט אילו בדיקות רופא/משרד הבריאות ממליץ לבצע בשבוע זה. " +
-                            "**חובה להשתמש בנקודות בולטות (מקף: - ) לכל בדיקה או המלצה. אסור להשאיר מקף ריק או טקסט שאינו שלם לאחר המקף.**\n" +
-                            "2. SECTION_RESULTS_START: הסבר באופן כללי מה אומרות תוצאות תקינות ומהן נקודות הדגל האדום שצריך לשים לב אליהן בבדיקות הנפוצות של השלב הזה. " +
-                            "**חובה לכתוב סעיף זה כרצף שלם של טקסט - פסקה רציפה אחת ללא הפסקות או קיטועים. " +
-                            "אסור בתכלית האיסור להשתמש בסימני רשימה, תבליטים, קווים, מקפים (-), או כוכביות (*).**\n" +
-                            "3. SECTION_UPCOMING_START: ספק הצצה קדימה לשבועות הבאים, ציין בקצרה אילו בדיקות מרכזיות מצפות לאם (למשל, סקירות, בדיקות סוכר). " +
-                            "**חובה לכתוב סעיף זה כרצף שלם של טקסט - פסקה רציפה אחת ללא הפסקות או קיטועים. " +
-                            "אסור בתכלית האיסור להשתמש בסימני רשימה, תבליטים, קווים, מקפים (-), או כוכביות (*).**",
-                    week
-            );
+            tvTitle.setText("בדיקות והנחיות רפואיות");
+            String prompt = getString(R.string.gemini_prompt_tests, week);
             tvTestsContent.setText("טוען מידע רפואי... ");
             startGeminiLoading(prompt);
         }
         return v;
     }
     private void startGeminiLoading(String prompt) {
-        Log.d("TESTS_FRAG","Sending Prompt: " + prompt);
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
         if (scrollView != null) scrollView.setVisibility(View.GONE);
         new GeminiPrompt(prompt, this);
@@ -113,9 +87,8 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
                 try {
                     parseAndSaveSections(rawResponse);
                     updateUiWithLoadedData();
-                    tvTitle.setText(String.format("בדיקות רפואיות")); // עדכון כותרת סופית
+                    tvTitle.setText("בדיקות רפואיות");
                 } catch (Exception e) {
-                    Log.e("TESTS_FRAG", "Error parsing content", e);
                     tvTitle.setText("שגיאה בעיבוד התוכן הרפואי.");
                 }
             });
@@ -128,14 +101,8 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
             getActivity().runOnUiThread(() -> {
                 if (progressBar != null) progressBar.setVisibility(View.GONE);
                 if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
-                Log.e("TESTS_FRAG", "API Error: " + errorMessage);
-                if(errorMessage.contains("Quota exceeded"))
-                {
-                    tvTitle.setText("הגעת למגבלת השימוש היומית. ניתן להמשיך מחר.");
-                }
-                else {
-                    tvTitle.setText("שגיאת רשת/API. לא ניתן לטעון מידע רפואי.");
-                }
+                tvTitle.setText(errorMessage.contains("Quota exceeded") ? 
+                    "הגעת למגבלת השימוש היומית. ניתן להמשיך מחר." : "שגיאת רשת/API.");
             });
         }
     }
@@ -151,13 +118,18 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
                 int end = (nextHeader != null) ? rawText.indexOf(nextHeader, start + currentHeader.length()) : -1;
                 String sectionText = (end != -1) ? rawText.substring(start, end) : rawText.substring(start);
                 String cleanText = sectionText.replace(currentHeader, "").trim();
+                
+                if (cleanText.startsWith(":") || cleanText.startsWith(" :")) {
+                    cleanText = cleanText.substring(cleanText.indexOf(":") + 1).trim();
+                }
+                
                 sections.put(currentHeader, cleanRawText(cleanText));
             }
         }
 
-        testsContent = sections.getOrDefault(HEADERS[0], "אין מידע זמין על בדיקות שבועיות.");
-        resultsContent = sections.getOrDefault(HEADERS[1], "אין מידע זמין על פענוח תוצאות.");
-        upcomingContent = sections.getOrDefault(HEADERS[2], "אין מידע זמין על בדיקות עתידיות.");
+        testsContent = sections.getOrDefault(HEADERS[0], "אין מידע זמין.");
+        resultsContent = sections.getOrDefault(HEADERS[1], "אין מידע זמין.");
+        upcomingContent = sections.getOrDefault(HEADERS[2], "אין מידע זמין.");
     }
 
     private void updateUiWithLoadedData() {
@@ -166,20 +138,14 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
         tvUpcomingTestsContent.setText(android.text.Html.fromHtml(upcomingContent, android.text.Html.FROM_HTML_MODE_LEGACY));
     }
 
-    private String cleanRawText(String rawDevelopmentText) {
-        if (rawDevelopmentText == null || rawDevelopmentText.isEmpty()) {
-            return "אין מידע זמין.";
-        }
-
-        String cleaned = rawDevelopmentText.trim();
-        cleaned = cleaned.replaceAll("[*\\-][\\s*]", "<br>• ");
-        cleaned = cleaned.replaceAll("(\\*\\*[^\\*]+\\*\\*)", "<br><br><b>$1</b>");
-        cleaned = cleaned.replaceAll("\\*\\*", "");
-
-        if (cleaned.startsWith("<br>")) {
-            cleaned = cleaned.replaceFirst("<br>", "");
-        }
-
+    private String cleanRawText(String text) {
+        if (text == null || text.isEmpty()) return "";
+        String cleaned = text.replaceAll("\\*\\*", "");
+        cleaned = cleaned.replaceAll("(?m)^\\s*[.:]\\s*$", "");
+        cleaned = cleaned.replaceAll("(?m)^\\s*[*\\-]\\s*", "<br>• ");
+        cleaned = cleaned.replaceAll("(<br>\\s*){2,}", "<br>");
+        cleaned = cleaned.trim();
+        if (cleaned.startsWith("<br>")) cleaned = cleaned.replaceFirst("<br>", "");
         return cleaned;
     }
 }
