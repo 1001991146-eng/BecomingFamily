@@ -1,52 +1,61 @@
 package com.example.becomingfamily;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class WeekCalculator {
-    private int week;
-    private int days;
-    private static Calendar calendar;
-    private static Date lastPeriodDate;
-    public WeekCalculator(LastPeriodDate last)
-    {
-        // 1. יצירת אובייקט Calendar
-        Calendar lastPeriodCal = Calendar.getInstance();
-        // 2. הגדרת התאריך הנכון:
-        // הערה חשובה: חודשי Calendar הם 0-11, לכן יש להחסיר 1 ממה שמגיע מה-DB (1-12)
-        int year = last.getYear();
-        int month = last.getMonth() - 1; // התיקון העיקרי! אם החודש 1 (ינואר), הוא יהפוך ל-0.
-        int day = last.getDay();
-        // הגדרת התאריך ב-Calendar
-        lastPeriodCal.set(year, month, day);
-        // 3. חילוץ תאריכים
-        lastPeriodDate = lastPeriodCal.getTime();
+    private final int week;
+    private final int days;
+
+    public WeekCalculator(LastPeriodDate last) {
+        if (last == null) {
+            this.week = 1;
+            this.days = 0;
+        } else {
+            Calendar lastPeriodCal = Calendar.getInstance();
+            lastPeriodCal.set(last.getYear(), last.getMonth() - 1, last.getDay(), 0, 0, 0);
+            lastPeriodCal.set(Calendar.MILLISECOND, 0);
+            
+            long diffInDays = calculateDiffInDays(lastPeriodCal.getTimeInMillis());
+            
+            if (diffInDays < 0) {
+                this.week = 1;
+                this.days = 0;
+            } else {
+                this.week = (int) (diffInDays / 7);
+                this.days = (int) (diffInDays % 7);
+            }
+        }
     }
 
-    public int GetWeek()
-    {
-        Date lastPeriodDate = calendar.getTime();
-        Date today = new Date();
-
-        long diffInMillies = today.getTime() - lastPeriodDate.getTime();
-        long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-        return (int) (diffInDays / 7) ;
-    }
-    public int GetDays()
-    {
-        Date lastPeriodDate = calendar.getTime();
-        Date today = new Date();
-
-        long diffInMillies = today.getTime() - lastPeriodDate.getTime();
-        long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-        return (int) (diffInDays % 7) ;
+    public WeekCalculator(long lmpMillis) {
+        long diffInDays = calculateDiffInDays(lmpMillis);
+        if (diffInDays < 0) {
+            this.week = 1;
+            this.days = 0;
+        } else {
+            this.week = (int) (diffInDays / 7);
+            this.days = (int) (diffInDays % 7);
+        }
     }
 
+    private long calculateDiffInDays(long lmpMillis) {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
 
+        long diffInMillies = today.getTimeInMillis() - lmpMillis;
+        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+    }
+
+    public int getWeek() {
+        return week;
+    }
+
+    public int getDays() {
+        return days;
+    }
 }

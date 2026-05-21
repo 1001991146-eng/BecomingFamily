@@ -49,39 +49,17 @@ private int currentWeek;
         return prefs.getLong(MyConstants.KEY_LMP_DATE, 0);
     }
     private boolean isNewPregnancyWeek() {
+        long lmpMillis = getLMPDateMillisFromStorage();
+        if (lmpMillis == 0) return false;
 
-        // **שלב 1: שלוף את תאריך ההתחלה**
-        // נניח ששמרת את התאריך (בזמן יוניקס-מילישניות) ב-SharedPreferences
-        // תאריך הריון משוער לפי תאריך המחזור האחרון (LMP).
-        long lmpMillis = getLMPDateMillisFromStorage(); // פונקציה שתצטרכי לכתוב
+        WeekCalculator calculator = new WeekCalculator(lmpMillis);
+        currentWeek = calculator.getWeek();
 
-        // **שלב 2: חישוב שבוע ההיריון הנוכחי**
-        long nowMillis = System.currentTimeMillis();
-        long totalDays = (nowMillis - lmpMillis) / (1000 * 60 * 60 * 24);
-
-        // היריון מלא הוא 40 שבועות (280 ימים)
-        currentWeek = (int) (totalDays / 7) ;
-
-        // **שלב 3: בדיקה אם היום הוא יום תחילת השבוע (היום הקבוע)**
-        // אם את מחשיבה את היום הראשון להיריון כיום ראשון של השבוע הראשון.
-
-        // נחשב את יום השבוע: יום 0 הוא יום ה-LMP, יום 7 הוא תחילת השבוע השני
-        // אם totalDays % 7 == 0, זהו יום תחילת השבוע החדש!
-
-        if (totalDays > 0 && currentWeek <= 42) { // הוספתי הגבלה ל-42 שבועות (סוף הריון)            // המבאס: "איך נדע שלא שלחנו כבר? אולי ה-Job רץ פעמיים בטעות?"
-            // סמיילי פייס: "המבאס צודק! צריך פה בדיקה נוספת!"
-
-            // **שלב 4: מניעת כפילויות (חשוב לבחינת בגרות)**
-            // בודקים אם כבר שלחנו PUSH בשבוע הנוכחי.
-            // נשמור ב-SharedPreferences את 'השבוע האחרון שנשלחה בו תזכורת'.
-            int lastNotifiedWeek = getLastNotifiedWeekFromStorage(); // פונקציה שתצטרכי לכתוב
-
-            if (currentWeek > lastNotifiedWeek) {
-                return true;
-            }
-        }
-        return false;
+        // בדיקה אם עבר שבוע מאז ההתראה האחרונה
+        int lastNotifiedWeek = getLastNotifiedWeekFromStorage();
+        return (currentWeek > lastNotifiedWeek && currentWeek <= 42);
     }
+
     private int getLastNotifiedWeekFromStorage() {
         SharedPreferences prefs = getSharedPreferences(MyConstants.SHARED_PREFS_FILE,Context.MODE_PRIVATE);
         // אם המשתנה לא קיים (הפעם הראשונה), ברירת המחדל תהיה 0.

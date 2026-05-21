@@ -87,26 +87,10 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
     }
 
     public void calculateCurrentWeek() {
-        user=UserManager.getInstance();
-
-        if (user == null || user.getLastPeriodDate() == null) {
-            week=1;
-            days=1;
-            return;
-        }
-        LastPeriodDate last = UserManager.getInstance().getLastPeriodDate();
-        Calendar lastPeriodCal = Calendar.getInstance();
-        int year = last.getYear();
-        int month = last.getMonth() - 1;
-        int day = last.getDay();
-        lastPeriodCal.set(year, month, day);
-        Date lastPeriodDate = lastPeriodCal.getTime();
-        Date today = new Date();
-        long diffInMillies = today.getTime() - lastPeriodDate.getTime();
-        long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-        week= (int) (diffInDays / 7) ;
-        days=(int) (diffInDays % 7);
-
+        user = UserManager.getInstance();
+        WeekCalculator calculator = new WeekCalculator(user.getLastPeriodDate());
+        this.week = calculator.getWeek();
+        this.days = calculator.getDays();
     }
 
     public void scheduleReminderJob() {
