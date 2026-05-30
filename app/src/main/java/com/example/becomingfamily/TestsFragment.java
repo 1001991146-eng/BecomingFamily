@@ -3,6 +3,7 @@ package com.example.becomingfamily;
 import android.app.Activity;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -47,6 +48,15 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isDataLoaded", isDataLoaded);
+        outState.putString("testsContent", testsContent);
+        outState.putString("resultsContent", resultsContent);
+        outState.putString("upcomingContent", upcomingContent);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v= inflater.inflate(R.layout.fragment_tests, container, false);
@@ -58,6 +68,13 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
         tvUpcomingTestsContent = v.findViewById(R.id.tvUpcomingTestsContent);
         progressBar = v.findViewById(R.id.progressBar);
         scrollView = v.findViewById(R.id.scrollView);
+
+        if (savedInstanceState != null) {
+            isDataLoaded = savedInstanceState.getBoolean("isDataLoaded");
+            testsContent = savedInstanceState.getString("testsContent");
+            resultsContent = savedInstanceState.getString("resultsContent");
+            upcomingContent = savedInstanceState.getString("upcomingContent");
+        }
 
         if (isDataLoaded) {
             updateUiWithLoadedData();

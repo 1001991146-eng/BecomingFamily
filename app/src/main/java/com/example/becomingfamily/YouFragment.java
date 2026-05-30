@@ -3,6 +3,7 @@ package com.example.becomingfamily;
 import android.app.Activity;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -64,6 +65,15 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isDataLoaded", isDataLoaded);
+        outState.putString("section1Content", section1Content);
+        outState.putString("section2Content", section2Content);
+        outState.putString("section3Content", section3Content);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v= inflater.inflate(R.layout.fragment_you, container, false);
@@ -78,6 +88,13 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
         scrollView = v.findViewById(R.id.scrollView);
 
         updateUIForRole(role);
+
+        if (savedInstanceState != null) {
+            isDataLoaded = savedInstanceState.getBoolean("isDataLoaded");
+            section1Content = savedInstanceState.getString("section1Content");
+            section2Content = savedInstanceState.getString("section2Content");
+            section3Content = savedInstanceState.getString("section3Content");
+        }
 
         if (isDataLoaded) {
             updateUiWithLoadedData();
