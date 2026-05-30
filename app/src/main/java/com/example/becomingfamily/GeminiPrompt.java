@@ -1,5 +1,7 @@
 package com.example.becomingfamily;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import com.google.ai.client.generativeai.GenerativeModel;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
@@ -9,7 +11,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class GeminiPrompt {
 
@@ -27,11 +28,8 @@ public class GeminiPrompt {
 
         Content content = new Content.Builder().addText(prompt).build();
 
-
-
-
-        // An executor is needed to handle the asynchronous response.
-        Executor mainExecutor = Executors.newSingleThreadExecutor();
+        // Deliver callbacks on the Main UI thread
+        Executor mainExecutor = command -> new Handler(Looper.getMainLooper()).post(command);
 
         ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
         Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {

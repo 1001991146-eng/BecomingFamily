@@ -80,31 +80,25 @@ public class TestsFragment extends Fragment implements GeminiResponseListener {
     @Override
     public void onGeminiSuccess(String rawResponse) {
         isDataLoaded = true;
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                if (progressBar != null) progressBar.setVisibility(View.GONE);
-                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
-                try {
-                    parseAndSaveSections(rawResponse);
-                    updateUiWithLoadedData();
-                    tvTitle.setText("בדיקות רפואיות");
-                } catch (Exception e) {
-                    tvTitle.setText("שגיאה בעיבוד התוכן הרפואי.");
-                }
-            });
+        if (!isAdded()) return;
+        if (progressBar != null) progressBar.setVisibility(View.GONE);
+        if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
+        try {
+            parseAndSaveSections(rawResponse);
+            updateUiWithLoadedData();
+            tvTitle.setText("בדיקות רפואיות");
+        } catch (Exception e) {
+            tvTitle.setText("שגיאה בעיבוד התוכן הרפואי.");
         }
     }
 
     @Override
     public void onGeminiFailure(String errorMessage) {
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                if (progressBar != null) progressBar.setVisibility(View.GONE);
-                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
-                tvTitle.setText(errorMessage.contains("Quota exceeded") ? 
-                    "הגעת למגבלת השימוש היומית. ניתן להמשיך מחר." : "שגיאת רשת/API.");
-            });
-        }
+        if (!isAdded()) return;
+        if (progressBar != null) progressBar.setVisibility(View.GONE);
+        if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
+        tvTitle.setText(errorMessage.contains("Quota exceeded") ? 
+            "הגעת למגבלת השימוש היומית. ניתן להמשיך מחר." : "שגיאת רשת/API.");
     }
 
     private void parseAndSaveSections(String rawText) {

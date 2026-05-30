@@ -121,43 +121,37 @@ public class YouFragment extends Fragment implements GeminiResponseListener {
     @Override
     public void onGeminiSuccess(String rawResponse) {
         isDataLoaded = true;
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                if (progressBar != null) progressBar.setVisibility(View.GONE);
-                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
-                try {
-                    parseAndSaveSections(rawResponse, role);
-                    updateUiWithLoadedData();
-                    if(role.equals("Mom"))
-                    {
-                        tvTitle.setText("לדאוג לעצמך: צעד אחר צעד");
-                    }
-                    else{
-                    tvTitle.setText("משפחה גדלה: המקום שלך במסע"); // עדכון כותרת סופית
-                        }
-                } catch (Exception e) {
-                    Log.e("PARTNER_FRAG", "Error parsing content", e);
-                    tvTitle.setText("שגיאה בעיבוד התוכן.");
-                }
-            });
+        if (!isAdded()) return;
+        if (progressBar != null) progressBar.setVisibility(View.GONE);
+        if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
+        try {
+            parseAndSaveSections(rawResponse, role);
+            updateUiWithLoadedData();
+            if(role.equals("Mom"))
+            {
+                tvTitle.setText("לדאוג לעצמך: צעד אחר צעד");
+            }
+            else{
+                tvTitle.setText("משפחה גדלה: המקום שלך במסע"); // עדכון כותרת סופית
+            }
+        } catch (Exception e) {
+            Log.e("PARTNER_FRAG", "Error parsing content", e);
+            tvTitle.setText("שגיאה בעיבוד התוכן.");
         }
     }
 
     @Override
     public void onGeminiFailure(String errorMessage) {
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                if (progressBar != null) progressBar.setVisibility(View.GONE);
-                if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
-                Log.e("PARTNER_FRAG", "API Error: " + errorMessage);
-                if(errorMessage.contains("Quota exceeded"))
-                {
-                    tvTitle.setText("הגעת למגבלת השימוש היומית. ניתן להמשיך מחר.");
-                }
-                else {
-                    tvTitle.setText("שגיאת רשת/API. נסה שוב.");
-                }
-            });
+        if (!isAdded()) return;
+        if (progressBar != null) progressBar.setVisibility(View.GONE);
+        if (scrollView != null) scrollView.setVisibility(View.VISIBLE);
+        Log.e("PARTNER_FRAG", "API Error: " + errorMessage);
+        if(errorMessage.contains("Quota exceeded"))
+        {
+            tvTitle.setText("הגעת למגבלת השימוש היומית. ניתן להמשיך מחר.");
+        }
+        else {
+            tvTitle.setText("שגיאת רשת/API. נסה שוב.");
         }
     }
 

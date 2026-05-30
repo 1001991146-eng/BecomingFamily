@@ -37,7 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class WeeklyUpdateActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
+public class WeeklyUpdateActivity extends AppCompatActivity {
     private MyBabyFragment babyFragment;
     private UserSettingsFragment userSettingsFragment;
     private TestsFragment testsFragment;
@@ -57,7 +57,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
     public static final String TESTS_FRAGMENT_TAG = "tests_fragment_tag";
     public static final String SETTINGS_FRAGMENT_TAG = "settings_fragment_tag";
 
-    private ConnectivityReceiver connectivityReceiver;
+    private ConnectivityManager.NetworkCallback networkCallback;
     private AlertDialog noConnectionDialog;
 
     public static boolean isNetworkAvailable(Context context) {
@@ -112,7 +112,6 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         setContentView(R.layout.activity_weekly_update);
         init();
         scheduleReminderJob();
-        connectivityReceiver = new ConnectivityReceiver();
 
         // Load the initial fragment only if the activity is newly created
         if (savedInstanceState == null) {
@@ -145,7 +144,7 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
 
         btn_user_settings.setOnClickListener(v -> {
             if (userSettingsFragment == null) {
-                userSettingsFragment = new UserSettingsFragment(WeeklyUpdateActivity.this, week, days);
+                userSettingsFragment = UserSettingsFragment.newInstance(week, days);
             }
             showFragment(userSettingsFragment, SETTINGS_FRAGMENT_TAG);
         });
@@ -168,7 +167,6 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
         } else {
             // If not, add it with the tag
             ft.replace(R.id.fragment_container, fragment, tag);
-            ft.addToBackStack(tag);
         }
         ft.commit();
     }
@@ -177,21 +175,31 @@ public class WeeklyUpdateActivity extends AppCompatActivity implements Connectiv
     @Override
     protected void onResume() {
         super.onResume();
-        ConnectivityReceiver.connectivityReceiverListener = this;
-        registerReceiver(connectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(@NonNull android.net.Network network) {
+                    runOnUiThread(() -> handleConnectivityChange(true));
+                }
+
+                @Override
+                public void onLost(@NonNull android.net.Network network) {
+                    runOnUiThread(() -> handleConnectivityChange(false));
+                }
+            };
+            cm.registerDefaultNetworkCallback(networkCallback);
+        }
         handleConnectivityChange(isNetworkAvailable(this));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(connectivityReceiver);
-        ConnectivityReceiver.connectivityReceiverListener = null;
-    }
-
-    @Override
-    public void onNetworkConnectionChanged(boolean isConnected) {
-        handleConnectivityChange(isConnected);
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null && networkCallback != null) {
+            cm.unregisterNetworkCallback(networkCallback);
+        }
     }
 
     private void handleConnectivityChange(boolean isConnected) {

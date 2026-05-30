@@ -87,39 +87,35 @@ public class LoginActivity extends AppCompatActivity {
     /* get user data from firebase based on email */
     public void LoadUserFromDBS()
     {
-        // יוצר שאילתה שמחפשת משתמשים שבהם השדה "email" שווה לערך המבוקש.
-        userRef.orderByChild("email").equalTo(etEmail.getText().toString())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                // snapshot הוא ה-UID של המשתמש (למשל, Q6SS...)
-                                User user = snapshot.getValue(User.class);
-                                UserManager.setInstance(user); // את שומרת אותו במנהל
-                                if (user != null) {
-                                    Log.d("MARIELA", "Retrieved user: " + user.toString());
-                                    tvError.setText("User retrieved successfully.");
-                                    // מצאנו את המשתמש, אפשר לצאת מהלולאה
-                                    Intent intent = new Intent(LoginActivity.this, WeeklyUpdateActivity.class);
-                                    startActivity(intent);
-                                    break;
-                                }
-                            }
-                        } else {
-                            // לא נמצא משתמש עם האימייל הזה
-                            tvError.setText("User not found.");
-                        }
+        if (mAuth.getCurrentUser() == null) {
+            tvError.setText("User not logged in.");
+            return;
+        }
+        String uid = mAuth.getCurrentUser().getUid();
+        userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User user = snapshot.getValue(User.class);
+                    UserManager.setInstance(user); // את שומרת אותו במנהל
+                    if (user != null) {
+                        Log.d("MARIELA", "Retrieved user: " + user.toString());
+                        tvError.setText("User retrieved successfully.");
+                        // מצאנו את המשתמש, מעבר למסך הבא
+                        Intent intent = new Intent(LoginActivity.this, WeeklyUpdateActivity.class);
+                        startActivity(intent);
                     }
+                } else {
+                    // לא נמצא משתמש עם ה-UID הזה
+                    tvError.setText("User not found.");
+                }
+            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        tvError.setText(error.toException().toString());
-
-                    }
-
-                    // ... onCancelled כפי שהיה ...
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                tvError.setText(error.toException().toString());
+            }
+        });
     }
 
 

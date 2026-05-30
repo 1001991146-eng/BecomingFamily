@@ -47,34 +47,45 @@ public class UserSettingsFragment extends Fragment {
     private int week;
     private int days;
     private String  newRole;
-    private Context context;
     private FirebaseDatabase database;
     private DatabaseReference userRef;
 
     private FirebaseAuth mAuth; // חשוב!
     private FirebaseUser firebaseUser; // חשוב!
     public static final String BABY_FRAGMENT_TAG = "my_baby_fragment"; // תג קבוע
+
     public UserSettingsFragment() {
         // Required empty public constructor
     }
-    public UserSettingsFragment(Context context, int week, int days) {
-        // Required empty public constructor
-        this.week=week;
-        this.days=days;
-        this.context=context;
-        user=UserManager.getInstance();
 
+    public static UserSettingsFragment newInstance(int week, int days) {
+        UserSettingsFragment fragment = new UserSettingsFragment();
+        Bundle args = new Bundle();
+        args.putInt("week", week);
+        args.putInt("days", days);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            week = getArguments().getInt("week");
+            days = getArguments().getInt("days");
+        }
+        user = UserManager.getInstance();
         database = FirebaseDatabase.getInstance();
         userRef = database.getReference("Users");
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
-
-
     }
     // --- לוגיקת מחיקת משתמש (Auth + DB) ---
     private void deleteUserAccount(final String password) {
         if (firebaseUser == null || user.getEmail() == null) {
-            Toast.makeText(context, "שגיאה: משתמש לא מחובר או חסר אימייל.", LENGTH_LONG).show();
+            if (isAdded()) {
+                Toast.makeText(requireContext(), "שגיאה: משתמש לא מחובר או חסר אימייל.", LENGTH_LONG).show();
+            }
             return;
         }
 
@@ -96,52 +107,42 @@ public class UserSettingsFragment extends Fragment {
                                             if (deleteTask.isSuccessful()) {
                                                 Log.d("MARIELA", "Firebase Auth account deleted successfully.");
                                                 // שלב 3: מחיקת נתונים מ-Realtime Database
-                                                deleteUserDataFromRealtimeDB(email);
+                                                deleteUserDataFromRealtimeDB(firebaseUser.getUid());
                                             } else {
                                                 Log.e("MARIELA", "Firebase Auth delete failed.", deleteTask.getException());
-                                                Toast.makeText(context, "שגיאה במחיקת חשבון האימות. נסה שוב.", LENGTH_LONG).show();
+                                                if (isAdded()) {
+                                                    Toast.makeText(requireContext(), "שגיאה במחיקת חשבון האימות. נסה שוב.", LENGTH_LONG).show();
+                                                }
                                             }
                                         }
                                     });
                         } else {
                             Log.e("MARIELA", "Re-authentication failed.", reauthTask.getException());
-                            Toast.makeText(context, "הסיסמה שגויה או נדרש התחברות נוספת.", LENGTH_LONG).show();
+                            if (isAdded()) {
+                                Toast.makeText(requireContext(), "הסיסמה שגויה או נדרש התחברות נוספת.", LENGTH_LONG).show();
+                            }
                         }
                     }
                 });
     }
     // --- לוגיקת מחיקת נתונים מ-Realtime DB ---
-    private void deleteUserDataFromRealtimeDB(String emailToDelete) {
-        userRef.orderByChild("email").equalTo(emailToDelete)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                snapshot.getRef().removeValue()
-                                        .addOnSuccessListener(aVoid -> {
-                                            Log.d("MARIELA", "User data for " + emailToDelete + " deleted successfully from Realtime DB.");
-                                            Toast.makeText(context, "החשבון נמחק בהצלחה.", LENGTH_LONG).show();
-                                            // לאחר מחיקה מלאה, נווט למסך ההתחברות/ראשי
-                                            Intent intent = new Intent(context, MainActivity.class);
-                                            // נקה את כל ה-Activities הקודמים מה-stack
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            startActivity(intent);
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e("MARIELA", "Failed to delete user data for " + emailToDelete, e);
-                                            Toast.makeText(context, "שגיאה במחיקת הנתונים. נסה שוב.", LENGTH_LONG).show();
-                                        });
-                            }
-                        } else {
-                            Log.d("MARIELA", "User data for " + emailToDelete + " not found in Realtime DB. Continuing...");
-                        }
+    private void deleteUserDataFromRealtimeDB(String uid) {
+        userRef.child(uid).removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("MARIELA", "User data for " + uid + " deleted successfully from Realtime DB.");
+                    if (isAdded()) {
+                        Toast.makeText(requireContext(), "החשבון נמחק בהצלחה.", LENGTH_LONG).show();
+                        // לאחר מחיקה מלאה, נווט למסך ההתחברות/ראשי
+                        Intent intent = new Intent(requireContext(), MainActivity.class);
+                        // נקה את כל ה-Activities הקודמים מה-stack
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("MARIELA", "Realtime Database query cancelled: " + databaseError.getMessage());
-                        Toast.makeText(context, "שגיאה בגישה לבסיס הנתונים.", LENGTH_LONG).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("MARIELA", "Failed to delete user data for " + uid, e);
+                    if (isAdded()) {
+                        Toast.makeText(requireContext(), "שגיאה במחיקת הנתונים. נסה שוב.", LENGTH_LONG).show();
                     }
                 });
     }
@@ -149,15 +150,17 @@ public class UserSettingsFragment extends Fragment {
     // --- לוגיקת הצגת דיאלוג אימות מחדש (Re-authentication) ---
     private void showReauthDialog() {
         if (firebaseUser == null) {
-            Toast.makeText(context, "שגיאה: המשתמש אינו מחובר.", Toast.LENGTH_SHORT).show();
+            if (isAdded()) {
+                Toast.makeText(requireContext(), "שגיאה: המשתמש אינו מחובר.", Toast.LENGTH_SHORT).show();
+            }
             return;
         }
 
         // יצירת EditText לסיסמה בתוך הדיאלוג
-        final EditText passwordInput = new EditText(context);
+        final EditText passwordInput = new EditText(requireContext());
         passwordInput.setHint("הכנס סיסמה נוכחית");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("אימות מחדש");
         builder.setMessage("אנא הזן את סיסמתך לאישור סופי של מחיקת החשבון:");
         builder.setView(passwordInput); // הוספת שדה הסיסמה לדיאלוג
@@ -167,12 +170,11 @@ public class UserSettingsFragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 String password = passwordInput.getText().toString();
                 if (password.isEmpty()) {
-                    Toast.makeText(context, "הסיסמה אינה יכולה להיות ריקה.", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) {
+                        Toast.makeText(requireContext(), "הסיסמה אינה יכולה להיות ריקה.", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     deleteUserAccount(password);
-                    // מחיקת משתמש
-                    Intent intent=new Intent(context,MainActivity.class);
-                    startActivity(intent);
                 }
             }
         });
@@ -221,7 +223,7 @@ public class UserSettingsFragment extends Fragment {
 
         // 2. יצירה והחלפה ל-MyBabyFragment כפרגמנט הבסיס החדש
         // אנחנו לא מוסיפים את זה ל-Back Stack כדי שכפתור ה-Back יצא מה-Activity
-        MyBabyFragment newBabyFragment = new MyBabyFragment((Activity)context, week,days);
+        MyBabyFragment newBabyFragment = new MyBabyFragment(requireActivity(), week,days);
         fm.beginTransaction()
                 .replace(R.id.fragment_container, newBabyFragment, BABY_FRAGMENT_TAG)
                 .commit();
@@ -234,7 +236,7 @@ public class UserSettingsFragment extends Fragment {
     {
         if (verifyUser())
         {
-            String uid=Auth.getCurrentUser().getUid();
+            String uid=mAuth.getCurrentUser().getUid();
             user=UserManager.getInstance();
             user.setFullName(etEFullName.getText().toString());
             user.setEmail(etEEmailRegister.getText().toString());
@@ -244,71 +246,49 @@ public class UserSettingsFragment extends Fragment {
             // verify old passord
             // 1. יצירת Credential מהסיסמה הישנה
             AuthCredential credential = EmailAuthProvider.getCredential(
-                        Auth.getCurrentUser().getEmail(),
+                        mAuth.getCurrentUser().getEmail(),
                         etEOriginalRegisterPassword.getText().toString()
             );
-            Auth.getCurrentUser().reauthenticate(credential)
+            mAuth.getCurrentUser().reauthenticate(credential)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             // 3. אימות מחדש הצליח, כעת ניתן לשנות את הסיסמה
-                            Auth.getCurrentUser().updatePassword(etERegisterPassword.getText().toString())
+                            mAuth.getCurrentUser().updatePassword(etERegisterPassword.getText().toString())
                                     .addOnCompleteListener(updateTask -> {
                                         if (updateTask.isSuccessful()) {
-                                            Toast.makeText(context, "הסיסמה עודכנה בהצלחה!", Toast.LENGTH_SHORT).show();
+                                            if (isAdded()) {
+                                                Toast.makeText(requireContext(), "הסיסמה עודכנה בהצלחה!", Toast.LENGTH_SHORT).show();
+                                            }
 
                                             Log.d("MARIELA","Save user:"+user.toString());
-                                            userRef.orderByChild("email").equalTo(user.getEmail())
-                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                            if (dataSnapshot.exists()) {
-                                                                // נמצא משתמש עם האימייל הנתון
-                                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                    // שלב 2: עדכון הנתונים של המשתמש
-                                                                    snapshot.getRef().setValue(user)
-                                                                            .addOnSuccessListener(aVoid -> {
-
-                                                                                Log.d("MARIELA", "User properties for " + user.getEmail() + " updated successfully.");
-                                                                                Toast.makeText(context,"שינויים נשמרו", LENGTH_LONG).show();
-                                                                                resetToMyBabyFragment();
-
-
-                                                                                Log.d("MARIELA","goto baby fragment");
-                                                                            })
-                                                                            .addOnFailureListener(e -> {
-                                                                                Log.e("MARIELA", "Failed to update user properties for " + user.getEmail(), e);
-                                                                            });
-                                                                }
-                                                            } else {
-                                                                // לא נמצא משתמש עם האימייל הנתון
-                                                                Log.d("MARIELA", "User with email " + user.getEmail() + " not found for update.");
-                                                            }
+                                            userRef.child(uid).setValue(user)
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Log.d("MARIELA", "User properties for " + user.getEmail() + " updated successfully.");
+                                                        if (isAdded()) {
+                                                            Toast.makeText(requireContext(),"שינויים נשמרו", LENGTH_LONG).show();
                                                         }
-
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                            // טיפול בשגיאות
-                                                            Log.e("MARIELA", "Database query cancelled: " + databaseError.getMessage());
-                                                        }
+                                                        resetToMyBabyFragment();
+                                                        Log.d("MARIELA","goto baby fragment");
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        Log.e("MARIELA", "Failed to update user properties for " + user.getEmail(), e);
                                                     });
-
-
-
-
                                         } else {
                                             Log.e("ChangePassword", "עדכון סיסמה נכשל", updateTask.getException());
-                                            Toast.makeText(context, "עדכון סיסמה נכשל.", Toast.LENGTH_SHORT).show();
+                                            if (isAdded()) {
+                                                Toast.makeText(requireContext(), "עדכון סיסמה נכשל.", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
                                     });
                         } else {
                             // אימות מחדש נכשל (הסיסמה הישנה שגויה)
                             Log.e("ChangePassword", "אימות מחדש נכשל", task.getException());
-                            Toast.makeText(context, "הסיסמה הנוכחית שגויה.", Toast.LENGTH_LONG).show();
+                            if (isAdded()) {
+                                Toast.makeText(requireContext(), "הסיסמה הנוכחית שגויה.", Toast.LENGTH_LONG).show();
+                            }
                         }
                     });
         }
-
-
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -336,13 +316,13 @@ public class UserSettingsFragment extends Fragment {
         if (user.getRole().equals("Mom"))
         {
             newRole="Mom";
-            fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.teal_200));
-            fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
+            fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.teal_200));
+            fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), android.R.color.darker_gray));
         }
         else {
             newRole="Dad";
-            fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.teal_200));
-            fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
+            fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.teal_200));
+            fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), android.R.color.darker_gray));
         }
 
         etEFullName.setText(user.getFullName());
@@ -355,16 +335,16 @@ public class UserSettingsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 newRole="Dad";
-                fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.teal_200));
-                fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
+                fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.teal_200));
+                fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), android.R.color.darker_gray));
             }
         });
         fabEMom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 newRole="Mom";
-                fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.teal_200));
-                fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
+                fabEMom.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.teal_200));
+                fabEDad.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), android.R.color.darker_gray));
 
             }
         });
@@ -378,14 +358,14 @@ public class UserSettingsFragment extends Fragment {
         btnTrack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(context,TrackActivity.class);
+                Intent intent=new Intent(requireContext(),TrackActivity.class);
                 startActivity(intent);
             }
         });
         btnEDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder adbCorrectResponse=new AlertDialog.Builder(context);
+                AlertDialog.Builder adbCorrectResponse=new AlertDialog.Builder(requireContext());
                 adbCorrectResponse.setTitle("מחיקת משתמש");
                 adbCorrectResponse.setMessage("האם את בטוחה שברצונך למחוק משתמש זה?");
                 adbCorrectResponse.setCancelable(true);
@@ -414,7 +394,7 @@ public class UserSettingsFragment extends Fragment {
         btnELogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder adbCorrectResponse=new AlertDialog.Builder(context);
+                AlertDialog.Builder adbCorrectResponse=new AlertDialog.Builder(requireContext());
                 adbCorrectResponse.setTitle("התנתקות");
                 adbCorrectResponse.setMessage("האם את בטוחה שברצונך להתנתק?");
                 adbCorrectResponse.setCancelable(true);
@@ -427,7 +407,7 @@ public class UserSettingsFragment extends Fragment {
                         Auth.signOut();
                         // בפונקציה של כפתור ההתנתקות:
                         UserManager.clear();
-                        Intent intent=new Intent(context,MainActivity.class);
+                        Intent intent=new Intent(requireContext(),MainActivity.class);
                         startActivity(intent);
                     }
                 });

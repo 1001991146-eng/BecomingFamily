@@ -147,22 +147,31 @@ public class TrackActivity extends AppCompatActivity {
     }
 
     private void updateUserInFirebase(LastPeriodDate lpd, EstimatedDate ed) {
-        userRef.orderByChild("email").equalTo(user.getEmail())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                            User u = ds.getValue(User.class);
-                            if (u != null) {
-                                u.setLastPeriodDate(lpd);
-                                u.setEstimatedDate(ed);
-                                UserManager.setInstance(u);
-                                ds.getRef().setValue(u);
-                            }
-                        }
-                    }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {}
-                });
+        String uid = null;
+        if (user != null) {
+            uid = user.getUid();
+        }
+        if (uid == null && com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null) {
+            uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
+        if (uid == null) {
+            Log.e("MARIELA", "Cannot update user in Firebase: uid is null");
+            return;
+        }
+
+        userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User u = snapshot.getValue(User.class);
+                if (u != null) {
+                    u.setLastPeriodDate(lpd);
+                    u.setEstimatedDate(ed);
+                    UserManager.setInstance(u);
+                    snapshot.getRef().setValue(u);
+                }
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
     @Override
